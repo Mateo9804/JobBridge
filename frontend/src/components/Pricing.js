@@ -113,6 +113,21 @@ function Pricing() {
       return;
     }
 
+    // Verificar que el plan seleccionado corresponda al tipo de cuenta del usuario
+    const userRole = user?.role;
+    const isCompanyPlan = selectedPlan.startsWith('company-');
+    const isUserPlan = selectedPlan.startsWith('user-');
+    
+    if (userRole === 'company' && !isCompanyPlan) {
+      setError('⚠️ Solo puedes suscribirte a planes de empresa con tu cuenta de empresa.');
+      return;
+    }
+    
+    if (userRole === 'user' && !isUserPlan) {
+      setError('⚠️ Solo puedes suscribirte a planes de usuario con tu cuenta de usuario.');
+      return;
+    }
+
     // Verificar si es un plan de pago
     const selectedPlanData = plans.find(p => p.id === selectedPlan);
     if (selectedPlanData && selectedPlanData.price !== 'Gratis') {
