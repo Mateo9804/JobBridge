@@ -24,6 +24,7 @@ function Header() {
             <li><Link to="/">Home</Link></li>
             <li><Link to="/jobs">Empleos</Link></li>
             <li><Link to="/companies">Empresas</Link></li>
+            <li><Link to="/pricing">Precios</Link></li>
             <li><Link to="/about">Acerca de</Link></li>
             <li><Link to="/contact">Contacto</Link></li>
           </ul>

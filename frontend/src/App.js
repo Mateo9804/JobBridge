@@ -9,6 +9,7 @@ import JobApplication from './components/JobApplication';
 import Companies from './components/Companies';
 import About from './components/About';
 import Contact from './components/Contact';
+import Pricing from './components/Pricing';
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
             <Route path="/companies" element={<Companies />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/pricing" element={<Pricing />} />
           </Routes>
         </div>
       </Router>

@@ -1,0 +1,512 @@
+.pricing-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.pricing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.pricing-hero {
+  text-align: center;
+  padding: 60px 0 40px;
+  color: white;
+}
+
+.pricing-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.pricing-content {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.plan-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 8px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toggle-option {
+  flex: 1;
+  text-align: center;
+  padding: 15px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.toggle-option.active {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  background: #c6f6d5;
+  color: #22543d;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin: 20px 40px;
+  border-left: 4px solid #48bb78;
+}
+
+.success-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  background: #fed7d7;
+  color: #742a2a;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin: 20px 40px;
+  border-left: 4px solid #f56565;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  padding: 40px;
+}
+
+.plan-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 30px;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.plan-card.popular {
+  border-color: #667eea;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+}
+
+.plan-card.selected {
+  border-color: #48bb78;
+  background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(72, 187, 120, 0.2);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.plan-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.plan-header h3 {
+  font-size: 1.8rem;
+  color: #2d3748;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.plan-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.price {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #667eea;
+  line-height: 1;
+}
+
+.period {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-top: 5px;
+}
+
+.plan-features {
+  margin-bottom: 25px;
+}
+
+.plan-features h4 {
+  color: #2d3748;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.plan-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.feature-icon {
+  color: #48bb78;
+  font-weight: bold;
+  margin-right: 12px;
+  font-size: 1.1rem;
+}
+
+.plan-limitations {
+  margin-bottom: 25px;
+}
+
+.plan-limitations h4 {
+  color: #2d3748;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.plan-limitations ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-limitations li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  color: #718096;
+  line-height: 1.5;
+  text-decoration: line-through;
+}
+
+.limitation-icon {
+  color: #f56565;
+  font-weight: bold;
+  margin-right: 12px;
+  font-size: 1.1rem;
+}
+
+.select-plan-btn {
+  width: 100%;
+  padding: 15px 20px;
+  border: 2px solid #667eea;
+  background: transparent;
+  color: #667eea;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.select-plan-btn:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.select-plan-btn.selected {
+  background: #48bb78;
+  border-color: #48bb78;
+  color: white;
+}
+
+.subscription-section {
+  background: #f7fafc;
+  padding: 30px 40px;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+}
+
+.selected-plan-info {
+  margin-bottom: 25px;
+}
+
+.selected-plan-info h3 {
+  color: #2d3748;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.selected-plan-info p {
+  color: #4a5568;
+  font-size: 1.1rem;
+}
+
+.subscribe-btn {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border: none;
+  padding: 18px 40px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.subscribe-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+}
+
+.subscribe-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pricing-info {
+  padding: 60px 40px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.info-item {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.info-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.info-item h4 {
+  color: #2d3748;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.info-item p {
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.pricing-faq {
+  padding: 60px 40px;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pricing-faq h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #2d3748;
+  margin-bottom: 50px;
+  font-weight: 600;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.faq-item {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.faq-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.faq-item h4 {
+  color: #2d3748;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.faq-item p {
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .plans-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .pricing-container {
+    padding: 15px;
+  }
+  
+  .plans-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .plan-card {
+    padding: 25px;
+  }
+  
+  .plan-header h3 {
+    font-size: 1.6rem;
+  }
+  
+  .price {
+    font-size: 2.5rem;
+  }
+  
+  .subscription-section {
+    padding: 25px 20px;
+  }
+  
+  .pricing-info {
+    padding: 40px 20px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  
+  .pricing-faq {
+    padding: 40px 20px;
+  }
+  
+  .pricing-faq h2 {
+    font-size: 2rem;
+  }
+  
+  .faq-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .faq-item {
+    padding: 25px 20px;
+  }
+  
+  .plan-toggle {
+    margin: 30px 20px;
+  }
+  
+  .toggle-option {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pricing-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .plan-header h3 {
+    font-size: 1.4rem;
+  }
+  
+  .price {
+    font-size: 2rem;
+  }
+  
+  .subscribe-btn {
+    padding: 15px 30px;
+    font-size: 1rem;
+  }
+  
+  .pricing-faq h2 {
+    font-size: 1.8rem;
+  }
+  
+  .info-icon {
+    font-size: 2.5rem;
+  }
+  
+  .info-item h4 {
+    font-size: 1.1rem;
+  }
+} 
