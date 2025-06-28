@@ -468,6 +468,117 @@
   margin-bottom: 0.5rem;
 }
 
+/* Límite de ofertas */
+.limit-notice {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  color: #856404;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.btn-upgrade {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-upgrade:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+}
+
+/* Modal de límite alcanzado */
+.limit-modal {
+  max-width: 500px;
+}
+
+.limit-content {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.limit-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.limit-content h3 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.limit-content p {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.premium-features {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.premium-features h4 {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.premium-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.premium-features li {
+  padding: 0.5rem 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.premium-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.premium-note {
+  color: #999;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* Botones deshabilitados */
+.btn-create-job:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-create-job:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .companies-container {
@@ -510,5 +621,24 @@
   .btn-primary,
   .btn-secondary {
     width: 100%;
+  }
+  
+  .limit-modal {
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+  }
+  
+  .premium-actions {
+    flex-direction: column;
+  }
+  
+  .limit-notice {
+    font-size: 0.8rem;
+  }
+  
+  .btn-upgrade {
+    display: block;
+    margin: 0.5rem auto 0;
+    width: fit-content;
   }
 } 

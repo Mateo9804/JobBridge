@@ -73,15 +73,32 @@ class JobController extends Controller
         try {
             Log::info('JobController@companyJobs called');
             
-            // Por ahora, devolver todos los trabajos hasta que implementemos autenticación
-            $jobs = Job::all();
+            // Obtener el usuario autenticado o usar un usuario por defecto
+            $userId = null;
+            if (auth()->check()) {
+                $userId = auth()->id();
+                Log::info('User authenticated for company jobs', ['user_id' => $userId]);
+            } else {
+                // Si no hay autenticación, usar el primer usuario company que encontremos
+                $companyUser = \App\Models\User::where('role', 'company')->first();
+                if ($companyUser) {
+                    $userId = $companyUser->id;
+                    Log::info('Using default company user for company jobs', ['user_id' => $userId]);
+                } else {
+                    Log::error('No company users found in database');
+                    return response()->json(['error' => 'No se encontró usuario de empresa válido'], 500);
+                }
+            }
+            
+            // Obtener trabajos de la empresa específica
+            $jobs = Job::where('user_id', $userId)->get();
             
             // Formatear cada job antes de devolver
             $formattedJobs = $jobs->map(function($job) {
                 return $this->formatJob($job);
             });
             
-            Log::info('Company jobs retrieved successfully', ['count' => $jobs->count()]);
+            Log::info('Company jobs retrieved successfully', ['count' => $jobs->count(), 'user_id' => $userId]);
             return response()->json($formattedJobs);
         } catch (\Exception $e) {
             Log::error('Error in JobController@companyJobs', ['error' => $e->getMessage()]);
@@ -120,12 +137,6 @@ class JobController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            // Procesar skills - puede ser string o array
-            $skills = $request->skills;
-            if (is_array($skills)) {
-                $skills = json_encode($skills);
-            }
-
             // Obtener el usuario autenticado o usar un usuario por defecto
             $userId = null;
             if (auth()->check()) {
@@ -141,6 +152,24 @@ class JobController extends Controller
                     Log::error('No company users found in database');
                     return response()->json(['error' => 'No se encontró usuario de empresa válido'], 500);
                 }
+            }
+
+            // Verificar límite de 2 ofertas por empresa
+            $existingJobsCount = Job::where('user_id', $userId)->count();
+            if ($existingJobsCount >= 2) {
+                Log::warning('Company job limit reached', ['user_id' => $userId, 'current_jobs' => $existingJobsCount]);
+                return response()->json([
+                    'error' => 'Límite de ofertas alcanzado',
+                    'message' => 'Has alcanzado el límite de 2 ofertas de trabajo gratuitas. Para publicar más ofertas, suscríbete a nuestro plan premium por $2.99/mes.',
+                    'limit_reached' => true,
+                    'current_jobs' => $existingJobsCount
+                ], 403);
+            }
+
+            // Procesar skills - puede ser string o array
+            $skills = $request->skills;
+            if (is_array($skills)) {
+                $skills = json_encode($skills);
             }
 
             $jobData = [

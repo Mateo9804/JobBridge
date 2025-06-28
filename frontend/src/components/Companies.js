@@ -8,6 +8,8 @@ import './Companies.css';
 function Companies() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [form, setForm] = useState({
     title: '',
@@ -23,7 +25,8 @@ function Companies() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [showLimitModal, setShowLimitModal] = useState(false);
   
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -51,23 +54,6 @@ function Companies() {
       console.error('Error fetching jobs:', error);
     }
   };
-
-  // Empleos de ejemplo (en una app real vendrían de la API)
-  const [companyJobs] = useState([
-    {
-      id: 1,
-      title: 'Desarrollador Frontend React',
-      location: 'Madrid, España',
-      category: 'frontend',
-      experience: 'junior',
-      salary: '€25,000 - €35,000',
-      description: 'Buscamos un desarrollador Frontend con experiencia en React.',
-      skills: ['React', 'JavaScript', 'CSS', 'HTML'],
-      type: 'Remoto',
-      posted: 'Hace 2 días',
-      status: 'activo'
-    }
-  ]);
 
   const handleCreateJob = async (e) => {
     e.preventDefault();
@@ -99,21 +85,113 @@ function Companies() {
       });
 
       if (response.ok) {
-        setSuccess(true);
+        setSuccess('¡Oferta creada exitosamente!');
         setShowCreateForm(false);
         fetchJobs();
         setTimeout(() => {
-          setSuccess(false);
+          setSuccess('');
           setForm({
             title: '', company: '', location: '', category: '', experience: '',
             salaryMin: 20000, salaryMax: 50000, description: '', skills: '', type: 'Presencial'
           });
         }, 3000);
+      } else {
+        const errorData = await response.json();
+        if (response.status === 403 && errorData.limit_reached) {
+          setShowLimitModal(true);
+        } else {
+          setError(errorData.message || 'Error al crear la oferta');
+        }
       }
     } catch (err) {
       setError('Error al crear el empleo. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditJob = (job) => {
+    setEditingJob(job);
+    setForm({
+      title: job.title,
+      company: job.company,
+      location: job.location,
+      category: job.category,
+      experience: job.experience,
+      salaryMin: job.salary_min,
+      salaryMax: job.salary_max,
+      description: job.description,
+      skills: Array.isArray(job.skills) ? job.skills.join(', ') : job.skills,
+      type: job.type
+    });
+    setShowEditForm(true);
+  };
+
+  const handleUpdateJob = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    if (form.salaryMin > form.salaryMax) {
+      setError('El salario mínimo no puede ser mayor que el máximo');
+      return;
+    }
+    
+    setLoading(true);
+
+    const formToSend = {
+      ...form,
+      skills: form.skills
+        ? form.skills.split(',').map(s => s.trim()).filter(Boolean)
+        : [],
+    };
+
+    try {
+      const response = await fetch(`http://localhost/api/jobs/${editingJob.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formToSend),
+      });
+
+      if (response.ok) {
+        setSuccess('¡Oferta actualizada exitosamente!');
+        setShowEditForm(false);
+        setEditingJob(null);
+        fetchJobs();
+        setTimeout(() => {
+          setSuccess('');
+        }, 3000);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Error al actualizar la oferta');
+      }
+    } catch (err) {
+      setError('Error al actualizar la oferta. Inténtalo de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta oferta de trabajo? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost/api/jobs/${jobId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setSuccess('¡Oferta eliminada exitosamente!');
+        fetchJobs();
+        setTimeout(() => {
+          setSuccess('');
+        }, 3000);
+      } else {
+        setError('Error al eliminar la oferta');
+      }
+    } catch (err) {
+      setError('Error al eliminar la oferta. Inténtalo de nuevo.');
     }
   };
 
@@ -184,8 +262,8 @@ function Companies() {
 
         {success && (
           <div className="success-message">
-            <h3>¡Empleo Creado!</h3>
-            <p>Tu oferta de trabajo ha sido publicada exitosamente.</p>
+            <h3>¡Éxito!</h3>
+            <p>{success}</p>
           </div>
         )}
 
@@ -194,13 +272,25 @@ function Companies() {
             <button 
               onClick={() => setShowCreateForm(true)}
               className="btn-create-job"
+              disabled={jobs.length >= 2}
             >
               + Crear Nueva Oferta
             </button>
+            {jobs.length >= 2 && (
+              <p className="limit-notice">
+                Has alcanzado el límite de 2 ofertas gratuitas. 
+                <button 
+                  onClick={() => setShowLimitModal(true)}
+                  className="btn-upgrade"
+                >
+                  Actualizar a Premium
+                </button>
+              </p>
+            )}
           </div>
 
           <div className="companies-jobs">
-            <h3>Tus Ofertas de Trabajo ({jobs.length})</h3>
+            <h3>Tus Ofertas de Trabajo ({jobs.length}/2)</h3>
             
             {jobs.length === 0 ? (
               <div className="no-jobs">
@@ -225,8 +315,18 @@ function Companies() {
                       <p><strong>Experiencia:</strong> {job.experience}</p>
                     </div>
                     <div className="job-actions">
-                      <button className="btn-edit">Editar</button>
-                      <button className="btn-delete">Eliminar</button>
+                      <button 
+                        className="btn-edit"
+                        onClick={() => handleEditJob(job)}
+                      >
+                        Editar
+                      </button>
+                      <button 
+                        className="btn-delete"
+                        onClick={() => handleDeleteJob(job.id)}
+                      >
+                        Eliminar
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -442,6 +542,264 @@ function Companies() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal para editar empleo */}
+        {showEditForm && (
+          <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Editar Oferta de Trabajo</h2>
+                <button className="modal-close" onClick={() => setShowEditForm(false)}>
+                  ×
+                </button>
+              </div>
+              
+              <form onSubmit={handleUpdateJob} className="create-job-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="title">Título del Puesto *</label>
+                    <input
+                      type="text"
+                      id="title"
+                      name="title"
+                      value={form.title}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="company">Empresa *</label>
+                    <input
+                      type="text"
+                      id="company"
+                      name="company"
+                      value={form.company}
+                      onChange={handleChange}
+                      required
+                      disabled={true}
+                      className="disabled-input"
+                    />
+                    <small className="form-help">El nombre de la empresa no se puede modificar</small>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="location">Ubicación *</label>
+                    <select
+                      id="location"
+                      name="location"
+                      value={form.location}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="">Selecciona una ciudad</option>
+                      <option value="Madrid, España">Madrid</option>
+                      <option value="Barcelona, España">Barcelona</option>
+                      <option value="Valencia, España">Valencia</option>
+                      <option value="Sevilla, España">Sevilla</option>
+                      <option value="Bilbao, España">Bilbao</option>
+                      <option value="Málaga, España">Málaga</option>
+                      <option value="Zaragoza, España">Zaragoza</option>
+                      <option value="Alicante, España">Alicante</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="type">Tipo de Trabajo *</label>
+                    <select
+                      id="type"
+                      name="type"
+                      value={form.type}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="Presencial">Presencial</option>
+                      <option value="Remoto">Remoto</option>
+                      <option value="Híbrido">Híbrido</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="category">Categoría *</label>
+                    <select
+                      id="category"
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="">Selecciona una categoría</option>
+                      <option value="frontend">Frontend</option>
+                      <option value="backend">Backend</option>
+                      <option value="fullstack">Full Stack</option>
+                      <option value="mobile">Mobile</option>
+                      <option value="devops">DevOps</option>
+                      <option value="data">Data Science</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="experience">Experiencia *</label>
+                    <select
+                      id="experience"
+                      name="experience"
+                      value={form.experience}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="">Selecciona experiencia</option>
+                      <option value="junior">Junior (0-2 años)</option>
+                      <option value="mid">Mid (2-5 años)</option>
+                      <option value="senior">Senior (5+ años)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="salary">Rango de Salario (€) *</label>
+                  <div className="salary-range">
+                    <div className="salary-inputs">
+                      <div className="salary-input">
+                        <label htmlFor="salaryMin">Mínimo</label>
+                        <input
+                          type="number"
+                          id="salaryMin"
+                          name="salaryMin"
+                          value={form.salaryMin}
+                          onChange={handleChange}
+                          min="15000"
+                          max="100000"
+                          step="1000"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="salary-input">
+                        <label htmlFor="salaryMax">Máximo</label>
+                        <input
+                          type="number"
+                          id="salaryMax"
+                          name="salaryMax"
+                          value={form.salaryMax}
+                          onChange={handleChange}
+                          min="15000"
+                          max="100000"
+                          step="1000"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
+                    <div className="salary-display">
+                      <span>€{form.salaryMin.toLocaleString()} - €{form.salaryMax.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="description">Descripción del Puesto *</label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                    rows="4"
+                    placeholder="Describe las responsabilidades y requisitos del puesto..."
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="skills">Habilidades Requeridas *</label>
+                  <input
+                    type="text"
+                    id="skills"
+                    name="skills"
+                    value={form.skills}
+                    onChange={handleChange}
+                    placeholder="Ej: React, JavaScript, CSS, HTML"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                {error && <p className="error-message">{error}</p>}
+
+                <div className="form-actions">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowEditForm(false)}
+                    className="btn-secondary"
+                    disabled={loading}
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? 'Actualizando...' : 'Actualizar Oferta'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de límite alcanzado */}
+        {showLimitModal && (
+          <div className="modal-overlay" onClick={() => setShowLimitModal(false)}>
+            <div className="modal-content limit-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>¡Límite Alcanzado!</h2>
+                <button className="modal-close" onClick={() => setShowLimitModal(false)}>
+                  ×
+                </button>
+              </div>
+              
+              <div className="limit-content">
+                <div className="limit-icon">💰</div>
+                <h3>Plan Premium Requerido</h3>
+                <p>Has alcanzado el límite de <strong>2 ofertas de trabajo gratuitas</strong>.</p>
+                <p>Para publicar más ofertas, suscríbete a nuestro plan premium:</p>
+                
+                <div className="premium-features">
+                  <h4>Plan Premium - $2.99/mes</h4>
+                  <ul>
+                    <li>✅ Ofertas de trabajo ilimitadas</li>
+                    <li>✅ Estadísticas avanzadas</li>
+                    <li>✅ Prioridad en búsquedas</li>
+                    <li>✅ Soporte prioritario</li>
+                  </ul>
+                </div>
+                
+                <div className="premium-actions">
+                  <button className="btn-primary">
+                    Suscribirse por $2.99/mes
+                  </button>
+                  <button 
+                    className="btn-secondary"
+                    onClick={() => setShowLimitModal(false)}
+                  >
+                    Más tarde
+                  </button>
+                </div>
+                
+                <p className="premium-note">
+                  <small>* Esta funcionalidad estará disponible próximamente</small>
+                </p>
+              </div>
             </div>
           </div>
         )}
