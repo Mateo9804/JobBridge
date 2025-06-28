@@ -28,6 +28,8 @@ function Companies() {
   const [success, setSuccess] = useState('');
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [deletingJobId, setDeletingJobId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState(null);
   
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -187,10 +189,6 @@ function Companies() {
   };
 
   const handleDeleteJob = async (jobId) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar esta oferta de trabajo? Esta acción no se puede deshacer.')) {
-      return;
-    }
-
     // Set individual loading state
     setDeletingJobId(jobId);
 
@@ -226,6 +224,19 @@ function Companies() {
     } finally {
       setDeletingJobId(null);
     }
+  };
+
+  const confirmDelete = (job) => {
+    setJobToDelete(job);
+    setShowDeleteModal(true);
+  };
+
+  const executeDelete = async () => {
+    if (!jobToDelete) return;
+    
+    await handleDeleteJob(jobToDelete.id);
+    setShowDeleteModal(false);
+    setJobToDelete(null);
   };
 
   const handleChange = (e) => {
@@ -357,7 +368,7 @@ function Companies() {
                       </button>
                       <button 
                         className="btn-delete"
-                        onClick={() => handleDeleteJob(job.id)}
+                        onClick={() => confirmDelete(job)}
                         disabled={deletingJobId === job.id}
                       >
                         {deletingJobId === job.id ? 'Eliminando...' : 'Eliminar'}
@@ -834,6 +845,38 @@ function Companies() {
                 <p className="premium-note">
                   <small>* Esta funcionalidad estará disponible próximamente</small>
                 </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal para confirmar eliminación */}
+        {showDeleteModal && (
+          <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+            <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>¿Estás seguro de que quieres eliminar esta oferta de trabajo?</h2>
+                <button className="modal-close" onClick={() => setShowDeleteModal(false)}>
+                  ×
+                </button>
+              </div>
+              
+              <div className="delete-content">
+                <p>Esta acción no se puede deshacer.</p>
+                <div className="delete-actions">
+                  <button 
+                    className="btn-primary"
+                    onClick={executeDelete}
+                  >
+                    Eliminar
+                  </button>
+                  <button 
+                    className="btn-secondary"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
