@@ -113,19 +113,26 @@ function Pricing() {
       return;
     }
 
+    // Verificar si es un plan de pago
+    const selectedPlanData = plans.find(p => p.id === selectedPlan);
+    if (selectedPlanData && selectedPlanData.price !== 'Gratis') {
+      setError('⚠️ Esta función aún no está preparada. Estamos trabajando para implementar el sistema de pagos próximamente.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
-    // Simular proceso de pago
+    // Simular proceso de pago solo para planes gratuitos
     setTimeout(() => {
       setLoading(false);
-      setSuccess('¡Suscripción exitosa! Tu plan ha sido activado.');
+      setSuccess('¡Plan activado exitosamente!');
       setSelectedPlan(null);
       
       setTimeout(() => {
         setSuccess('');
       }, 5000);
-    }, 3000);
+    }, 2000);
   };
 
   const plans = userType === 'company' ? companyPlans : userPlans;
