@@ -6,6 +6,7 @@ import './Pricing.css';
 function Pricing() {
   const { user, isAuthenticated } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [userType, setUserType] = useState('user'); // 'user' or 'company'
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -32,38 +33,20 @@ function Pricing() {
     {
       id: 'company-pro',
       name: 'Plan Profesional',
-      price: '€29',
+      price: '$2.99',
       period: 'por mes',
       features: [
         'Ofertas ilimitadas',
-        'Ofertas destacadas (3 por mes)',
+        'Ofertas destacadas (5 por mes)',
         'Filtros avanzados de candidatos',
         'Reportes detallados',
         'Soporte prioritario',
         'Panel de administración avanzado',
-        'Integración con ATS',
-        'Análisis de candidatos'
+        'Análisis de candidatos',
+        'Notificaciones en tiempo real'
       ],
       limitations: [],
       popular: true
-    },
-    {
-      id: 'company-enterprise',
-      name: 'Plan Empresarial',
-      price: '€99',
-      period: 'por mes',
-      features: [
-        'Todo del Plan Profesional',
-        'Ofertas destacadas ilimitadas',
-        'Soporte 24/7',
-        'API personalizada',
-        'Consultoría especializada',
-        'Branding personalizado',
-        'Múltiples cuentas de usuario',
-        'Integración con HRIS'
-      ],
-      limitations: [],
-      popular: false
     }
   ];
 
@@ -87,9 +70,9 @@ function Pricing() {
       popular: false
     },
     {
-      id: 'user-premium',
-      name: 'Plan Premium',
-      price: '€9.99',
+      id: 'user-pro',
+      name: 'Plan Profesional',
+      price: '$2.99',
       period: 'por mes',
       features: [
         'Postulaciones ilimitadas',
@@ -103,26 +86,15 @@ function Pricing() {
       ],
       limitations: [],
       popular: true
-    },
-    {
-      id: 'user-pro',
-      name: 'Plan Pro',
-      price: '€19.99',
-      period: 'por mes',
-      features: [
-        'Todo del Plan Premium',
-        'Coaching de carrera',
-        'Entrevistas simuladas',
-        'Análisis de mercado salarial',
-        'Networking exclusivo',
-        'Certificaciones gratuitas',
-        'Soporte prioritario',
-        'Mentoría personalizada'
-      ],
-      limitations: [],
-      popular: false
     }
   ];
+
+  const handleUserTypeChange = (type) => {
+    setUserType(type);
+    setSelectedPlan(null);
+    setSuccess('');
+    setError('');
+  };
 
   const handlePlanSelect = (planId) => {
     setSelectedPlan(planId);
@@ -156,8 +128,7 @@ function Pricing() {
     }, 3000);
   };
 
-  const isCompany = user?.role === 'company';
-  const plans = isCompany ? companyPlans : userPlans;
+  const plans = userType === 'company' ? companyPlans : userPlans;
 
   return (
     <div className="pricing-page">
@@ -166,17 +137,23 @@ function Pricing() {
         <div className="pricing-hero">
           <h1>Planes y Precios</h1>
           <p className="hero-subtitle">
-            Elige el plan perfecto para tu {isCompany ? 'empresa' : 'carrera profesional'}
+            Elige el plan perfecto para tu {userType === 'company' ? 'empresa' : 'carrera profesional'}
           </p>
         </div>
 
         <div className="pricing-content">
           {/* Toggle para cambiar entre planes */}
           <div className="plan-toggle">
-            <div className={`toggle-option ${!isCompany ? 'active' : ''}`}>
+            <div 
+              className={`toggle-option ${userType === 'user' ? 'active' : ''}`}
+              onClick={() => handleUserTypeChange('user')}
+            >
               <span>👤 Planes para Usuarios</span>
             </div>
-            <div className={`toggle-option ${isCompany ? 'active' : ''}`}>
+            <div 
+              className={`toggle-option ${userType === 'company' ? 'active' : ''}`}
+              onClick={() => handleUserTypeChange('company')}
+            >
               <span>🏢 Planes para Empresas</span>
             </div>
           </div>
