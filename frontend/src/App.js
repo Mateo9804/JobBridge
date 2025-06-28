@@ -7,6 +7,7 @@ import Register from './components/Register';
 import Login from './components/Login';
 import JobApplication from './components/JobApplication';
 import Companies from './components/Companies';
+import About from './components/About';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/apply/:jobId" element={<JobApplication />} />
             <Route path="/companies" element={<Companies />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </div>
       </Router>
