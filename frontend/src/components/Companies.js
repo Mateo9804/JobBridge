@@ -30,9 +30,79 @@ function Companies() {
   const [deletingJobId, setDeletingJobId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [jobToDelete, setJobToDelete] = useState(null);
+  const [selectedSkills, setSelectedSkills] = useState([]);
   
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+
+  // Opciones predefinidas para títulos de puestos
+  const jobTitles = [
+    'Desarrollador Frontend',
+    'Desarrollador Backend',
+    'Desarrollador Full Stack',
+    'Desarrollador Mobile',
+    'Desarrollador React',
+    'Desarrollador Angular',
+    'Desarrollador Vue.js',
+    'Desarrollador Node.js',
+    'Desarrollador Python',
+    'Desarrollador Java',
+    'Desarrollador PHP',
+    'Desarrollador .NET',
+    'Desarrollador Ruby',
+    'Desarrollador Go',
+    'Desarrollador Rust',
+    'Ingeniero de Software',
+    'Arquitecto de Software',
+    'DevOps Engineer',
+    'Data Scientist',
+    'Data Engineer',
+    'Machine Learning Engineer',
+    'QA Engineer',
+    'Test Engineer',
+    'Product Manager',
+    'Scrum Master',
+    'Tech Lead',
+    'Team Lead',
+    'Project Manager',
+    'UX/UI Designer',
+    'Diseñador Web',
+    'Analista de Sistemas',
+    'Administrador de Sistemas',
+    'DBA (Database Administrator)',
+    'Cloud Engineer',
+    'Security Engineer',
+    'Blockchain Developer',
+    'Game Developer',
+    'Embedded Developer',
+    'iOS Developer',
+    'Android Developer',
+    'Flutter Developer',
+    'React Native Developer'
+  ];
+
+  // Opciones predefinidas para skills/lenguajes
+  const availableSkills = [
+    'HTML', 'CSS', 'JavaScript', 'TypeScript', 'React', 'Angular', 'Vue.js',
+    'Node.js', 'Python', 'Java', 'PHP', 'C#', '.NET', 'Ruby', 'Go', 'Rust',
+    'Swift', 'Kotlin', 'Dart', 'Flutter', 'React Native', 'Xamarin',
+    'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'SQLite', 'Oracle',
+    'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud', 'Firebase',
+    'Git', 'GitHub', 'GitLab', 'Bitbucket', 'Jenkins', 'Travis CI',
+    'Jest', 'Mocha', 'Cypress', 'Selenium', 'JUnit', 'PyTest',
+    'REST API', 'GraphQL', 'SOAP', 'WebSocket', 'gRPC',
+    'Redux', 'Vuex', 'MobX', 'Zustand', 'Context API',
+    'Webpack', 'Vite', 'Babel', 'ESLint', 'Prettier',
+    'Sass', 'Less', 'Stylus', 'Tailwind CSS', 'Bootstrap',
+    'Express.js', 'FastAPI', 'Django', 'Flask', 'Spring Boot',
+    'Laravel', 'Symfony', 'CodeIgniter', 'WordPress', 'Drupal',
+    'TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy',
+    'Linux', 'Ubuntu', 'CentOS', 'Windows Server', 'macOS',
+    'Nginx', 'Apache', 'IIS', 'HAProxy', 'Load Balancer',
+    'Microservices', 'Monolith', 'Serverless', 'Event-Driven',
+    'Agile', 'Scrum', 'Kanban', 'Waterfall', 'DevOps',
+    'CI/CD', 'TDD', 'BDD', 'DDD', 'Clean Architecture'
+  ];
 
   // Cargar trabajos al montar el componente
   useEffect(() => {
@@ -81,15 +151,18 @@ function Companies() {
       setError('El salario mínimo no puede ser mayor que el máximo');
       return;
     }
+
+    if (selectedSkills.length === 0) {
+      setError('Debes seleccionar al menos una habilidad');
+      return;
+    }
     
     setLoading(true);
 
     // Convertir skills a array antes de enviar
     const formToSend = {
       ...form,
-      skills: form.skills
-        ? form.skills.split(',').map(s => s.trim()).filter(Boolean)
-        : [],
+      skills: selectedSkills,
     };
 
     console.log('Datos a enviar:', formToSend);
@@ -104,6 +177,7 @@ function Companies() {
       if (response.ok) {
         setSuccess('¡Oferta creada exitosamente!');
         setShowCreateForm(false);
+        setSelectedSkills([]);
         fetchJobs();
         setTimeout(() => {
           setSuccess('');
@@ -129,6 +203,17 @@ function Companies() {
 
   const handleEditJob = (job) => {
     setEditingJob(job);
+    
+    // Procesar skills para el formulario de edición
+    let jobSkills = [];
+    if (Array.isArray(job.skills)) {
+      jobSkills = job.skills;
+    } else if (typeof job.skills === 'string') {
+      jobSkills = job.skills.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    
+    setSelectedSkills(jobSkills);
+    
     setForm({
       title: job.title,
       company: job.company,
@@ -138,7 +223,7 @@ function Companies() {
       salaryMin: job.salary_min,
       salaryMax: job.salary_max,
       description: job.description,
-      skills: Array.isArray(job.skills) ? job.skills.join(', ') : job.skills,
+      skills: jobSkills.join(', '),
       type: job.type
     });
     setShowEditForm(true);
@@ -152,14 +237,17 @@ function Companies() {
       setError('El salario mínimo no puede ser mayor que el máximo');
       return;
     }
+
+    if (selectedSkills.length === 0) {
+      setError('Debes seleccionar al menos una habilidad');
+      return;
+    }
     
     setLoading(true);
 
     const formToSend = {
       ...form,
-      skills: form.skills
-        ? form.skills.split(',').map(s => s.trim()).filter(Boolean)
-        : [],
+      skills: selectedSkills,
     };
 
     try {
@@ -173,6 +261,7 @@ function Companies() {
         setSuccess('¡Oferta actualizada exitosamente!');
         setShowEditForm(false);
         setEditingJob(null);
+        setSelectedSkills([]);
         fetchJobs();
         setTimeout(() => {
           setSuccess('');
@@ -241,7 +330,15 @@ function Companies() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    
+    if (name === 'skills') {
+      // Manejar selección múltiple de skills
+      const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
+      setSelectedSkills(selectedOptions);
+      setForm(prev => ({ ...prev, [name]: selectedOptions.join(', ') }));
+    } else {
+      setForm({ ...form, [name]: value });
+    }
     
     // Validar que el salario máximo no sea menor que el mínimo
     if (name === 'salaryMin' && parseInt(value) > form.salaryMax) {
@@ -251,6 +348,35 @@ function Companies() {
     } else {
       setError('');
     }
+  };
+
+  const handleSkillToggle = (skill) => {
+    setSelectedSkills(prev => {
+      const isSelected = prev.includes(skill);
+      let newSkills;
+      
+      if (isSelected) {
+        newSkills = prev.filter(s => s !== skill);
+      } else {
+        if (prev.length >= 5) {
+          setError('Puedes seleccionar máximo 5 habilidades');
+          return prev;
+        }
+        newSkills = [...prev, skill];
+      }
+      
+      setForm(prevForm => ({ ...prevForm, skills: newSkills.join(', ') }));
+      setError('');
+      return newSkills;
+    });
+  };
+
+  const removeSkill = (skillToRemove) => {
+    setSelectedSkills(prev => {
+      const newSkills = prev.filter(skill => skill !== skillToRemove);
+      setForm(prevForm => ({ ...prevForm, skills: newSkills.join(', ') }));
+      return newSkills;
+    });
   };
 
   // Si no está autenticado, mostrar modal de autenticación
@@ -396,15 +522,19 @@ function Companies() {
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="title">Título del Puesto *</label>
-                    <input
-                      type="text"
+                    <select
                       id="title"
                       name="title"
                       value={form.title}
                       onChange={handleChange}
                       required
                       disabled={loading}
-                    />
+                    >
+                      <option value="">Selecciona un título</option>
+                      {jobTitles.map((title, index) => (
+                        <option key={index} value={title}>{title}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group">
                     <label htmlFor="company">Empresa *</label>
@@ -555,17 +685,48 @@ function Companies() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="skills">Habilidades Requeridas *</label>
-                  <input
-                    type="text"
-                    id="skills"
-                    name="skills"
-                    value={form.skills}
-                    onChange={handleChange}
-                    placeholder="Ej: React, JavaScript, CSS, HTML"
-                    required
-                    disabled={loading}
-                  />
+                  <label htmlFor="skills">Habilidades Requeridas * (Máximo 5)</label>
+                  <div className="skills-container">
+                    <div className="skills-dropdown">
+                      <select
+                        id="skills"
+                        name="skills"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleSkillToggle(e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        disabled={loading || selectedSkills.length >= 5}
+                      >
+                        <option value="">Selecciona habilidades</option>
+                        {availableSkills
+                          .filter(skill => !selectedSkills.includes(skill))
+                          .map((skill, index) => (
+                            <option key={index} value={skill}>{skill}</option>
+                          ))
+                        }
+                      </select>
+                    </div>
+                    <div className="selected-skills">
+                      {selectedSkills.map((skill, index) => (
+                        <span key={index} className="skill-tag">
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => removeSkill(skill)}
+                            className="remove-skill"
+                            disabled={loading}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    {selectedSkills.length >= 5 && (
+                      <small className="skills-limit">Has alcanzado el límite de 5 habilidades</small>
+                    )}
+                  </div>
                 </div>
 
                 {error && <p className="error-message">{error}</p>}
@@ -607,15 +768,19 @@ function Companies() {
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="title">Título del Puesto *</label>
-                    <input
-                      type="text"
+                    <select
                       id="title"
                       name="title"
                       value={form.title}
                       onChange={handleChange}
                       required
                       disabled={loading}
-                    />
+                    >
+                      <option value="">Selecciona un título</option>
+                      {jobTitles.map((title, index) => (
+                        <option key={index} value={title}>{title}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group">
                     <label htmlFor="company">Empresa *</label>
@@ -766,17 +931,48 @@ function Companies() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="skills">Habilidades Requeridas *</label>
-                  <input
-                    type="text"
-                    id="skills"
-                    name="skills"
-                    value={form.skills}
-                    onChange={handleChange}
-                    placeholder="Ej: React, JavaScript, CSS, HTML"
-                    required
-                    disabled={loading}
-                  />
+                  <label htmlFor="skills">Habilidades Requeridas * (Máximo 5)</label>
+                  <div className="skills-container">
+                    <div className="skills-dropdown">
+                      <select
+                        id="skills"
+                        name="skills"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleSkillToggle(e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        disabled={loading || selectedSkills.length >= 5}
+                      >
+                        <option value="">Selecciona habilidades</option>
+                        {availableSkills
+                          .filter(skill => !selectedSkills.includes(skill))
+                          .map((skill, index) => (
+                            <option key={index} value={skill}>{skill}</option>
+                          ))
+                        }
+                      </select>
+                    </div>
+                    <div className="selected-skills">
+                      {selectedSkills.map((skill, index) => (
+                        <span key={index} className="skill-tag">
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => removeSkill(skill)}
+                            className="remove-skill"
+                            disabled={loading}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    {selectedSkills.length >= 5 && (
+                      <small className="skills-limit">Has alcanzado el límite de 5 habilidades</small>
+                    )}
+                  </div>
                 </div>
 
                 {error && <p className="error-message">{error}</p>}
