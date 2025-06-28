@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JobBridge Proxy</title>
+</head>
+<body>
+    <h1>JobBridge API Proxy</h1>
+    <p>Este archivo actúa como proxy para evitar problemas de CORS.</p>
+    <script>
+        // Función para hacer peticiones al backend
+        window.proxyRequest = async function(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+                return response;
+            } catch (error) {
+                console.error('Error en proxy:', error);
+                throw error;
+            }
+        };
+    </script>
+</body>
+</html> 
