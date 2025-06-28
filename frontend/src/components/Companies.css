@@ -201,6 +201,19 @@
   background: #c82333;
 }
 
+.btn-edit:disabled,
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-edit:disabled:hover,
+.btn-delete:disabled:hover {
+  background: inherit;
+  transform: none;
+}
+
 /* Modal para crear empleo */
 .modal-overlay {
   position: fixed;

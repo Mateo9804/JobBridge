@@ -27,6 +27,7 @@ function Companies() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [deletingJobId, setDeletingJobId] = useState(null);
   
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -45,13 +46,27 @@ function Companies() {
 
   const fetchJobs = async () => {
     try {
-      const response = await fetch('http://localhost/api/company/jobs');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch('http://localhost/api/company/jobs', {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
       if (response.ok) {
         const data = await response.json();
         setJobs(data);
+      } else {
+        console.error('Error fetching jobs:', response.status);
       }
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      if (error.name === 'AbortError') {
+        console.error('Request timeout');
+      } else {
+        console.error('Error fetching jobs:', error);
+      }
     }
   };
 
@@ -176,6 +191,13 @@ function Companies() {
       return;
     }
 
+    // Set individual loading state
+    setDeletingJobId(jobId);
+
+    // Optimistic update: remove from UI immediately
+    const jobToDelete = jobs.find(job => job.id === jobId);
+    setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+
     try {
       const response = await fetch(`http://localhost/api/jobs/${jobId}`, {
         method: 'DELETE',
@@ -183,15 +205,26 @@ function Companies() {
 
       if (response.ok) {
         setSuccess('¡Oferta eliminada exitosamente!');
-        fetchJobs();
         setTimeout(() => {
           setSuccess('');
         }, 3000);
       } else {
-        setError('Error al eliminar la oferta');
+        // If deletion failed, restore the job to the list
+        setJobs(prevJobs => [...prevJobs, jobToDelete].sort((a, b) => a.id - b.id));
+        setError('Error al eliminar la oferta. Inténtalo de nuevo.');
+        setTimeout(() => {
+          setError('');
+        }, 3000);
       }
     } catch (err) {
-      setError('Error al eliminar la oferta. Inténtalo de nuevo.');
+      // If network error, restore the job to the list
+      setJobs(prevJobs => [...prevJobs, jobToDelete].sort((a, b) => a.id - b.id));
+      setError('Error de conexión. Inténtalo de nuevo.');
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+    } finally {
+      setDeletingJobId(null);
     }
   };
 
@@ -318,14 +351,16 @@ function Companies() {
                       <button 
                         className="btn-edit"
                         onClick={() => handleEditJob(job)}
+                        disabled={deletingJobId === job.id}
                       >
                         Editar
                       </button>
                       <button 
                         className="btn-delete"
                         onClick={() => handleDeleteJob(job.id)}
+                        disabled={deletingJobId === job.id}
                       >
-                        Eliminar
+                        {deletingJobId === job.id ? 'Eliminando...' : 'Eliminar'}
                       </button>
                     </div>
                   </div>

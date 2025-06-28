@@ -266,10 +266,14 @@ class JobController extends Controller
     public function destroy(Job $job)
     {
         try {
+            Log::info('JobController@destroy called', ['job_id' => $job->id]);
+            
             $job->delete();
+            
+            Log::info('Job deleted successfully', ['job_id' => $job->id]);
             return response()->json(['message' => 'Job deleted successfully']);
         } catch (\Exception $e) {
-            Log::error('Error in JobController@destroy', ['error' => $e->getMessage()]);
+            Log::error('Error in JobController@destroy', ['error' => $e->getMessage(), 'job_id' => $job->id]);
             return response()->json(['error' => 'Error al eliminar trabajo: ' . $e->getMessage()], 500);
         }
     }
