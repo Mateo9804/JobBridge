@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('company_name')->nullable()->after('role');
+            $table->string('logo')->nullable();
+            $table->text('description')->nullable();
+            $table->string('website')->nullable();
+            $table->string('location')->nullable();
         });
     }
 
@@ -23,6 +27,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('company_name');
+            $table->dropColumn(['logo', 'description', 'website', 'location']);
         });
     }
 };

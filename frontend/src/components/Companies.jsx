@@ -14,7 +14,6 @@ function Companies() {
   const [jobs, setJobs] = useState([]);
   const [form, setForm] = useState({
     title: '',
-    company: '',
     location: '',
     category: '',
     experience: '',
@@ -110,11 +109,6 @@ function Companies() {
   useEffect(() => {
     if (isAuthenticated && user?.role === 'company') {
       fetchJobs();
-      // Establecer el nombre de la empresa en el formulario
-      setForm(prev => ({
-        ...prev,
-        company: user?.company_name || user?.name || ''
-      }));
     }
   }, [isAuthenticated, user]);
 
@@ -164,6 +158,7 @@ function Companies() {
     // Convertir skills a array antes de enviar
     const formToSend = {
       ...form,
+      company: user?.company_name || user?.name || '',
       skills: selectedSkills,
     };
 
@@ -185,7 +180,7 @@ function Companies() {
         setTimeout(() => {
           setSuccess('');
           setForm({
-            title: '', company: '', location: '', category: '', experience: '',
+            title: '', location: '', category: '', experience: '',
             salaryMin: 20000, salaryMax: 50000, description: '', skills: '', type: 'Presencial'
           });
         }, 3000);
@@ -219,7 +214,6 @@ function Companies() {
     
     setForm({
       title: job.title,
-      company: job.company,
       location: job.location,
       category: job.category,
       experience: job.experience,
@@ -540,23 +534,6 @@ function Companies() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="company">Empresa *</label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      value={form.company}
-                      onChange={handleChange}
-                      required
-                      disabled={true}
-                      className="disabled-input"
-                    />
-                    <small className="form-help">El nombre de la empresa no se puede modificar</small>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
                     <label htmlFor="location">Ubicación *</label>
                     <select
                       id="location"
@@ -577,6 +554,9 @@ function Companies() {
                       <option value="Alicante, España">Alicante</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="type">Tipo de Trabajo *</label>
                     <select
@@ -592,9 +572,6 @@ function Companies() {
                       <option value="Híbrido">Híbrido</option>
                     </select>
                   </div>
-                </div>
-
-                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="category">Categoría *</label>
                     <select
@@ -614,6 +591,9 @@ function Companies() {
                       <option value="data">Data Science</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="experience">Experiencia *</label>
                     <select
@@ -786,23 +766,6 @@ function Companies() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="company">Empresa *</label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      value={form.company}
-                      onChange={handleChange}
-                      required
-                      disabled={true}
-                      className="disabled-input"
-                    />
-                    <small className="form-help">El nombre de la empresa no se puede modificar</small>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
                     <label htmlFor="location">Ubicación *</label>
                     <select
                       id="location"
@@ -823,6 +786,9 @@ function Companies() {
                       <option value="Alicante, España">Alicante</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="type">Tipo de Trabajo *</label>
                     <select
@@ -838,9 +804,6 @@ function Companies() {
                       <option value="Híbrido">Híbrido</option>
                     </select>
                   </div>
-                </div>
-
-                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="category">Categoría *</label>
                     <select
@@ -860,6 +823,9 @@ function Companies() {
                       <option value="data">Data Science</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="experience">Experiencia *</label>
                     <select

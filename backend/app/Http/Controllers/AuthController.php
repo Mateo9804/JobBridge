@@ -132,34 +132,76 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
         $user = $request->user();
-        $data = $request->only(['name', 'description']);
+        \Log::info('Datos recibidos en updateProfile', $request->all());
+        \Log::info('Archivos recibidos', $request->allFiles());
 
-        // Actualizar nombre y descripción
+        $data = $request->only(['name', 'description', 'website', 'location', 'industry']);
+
+        // Actualizar campos comunes
         if (isset($data['name'])) {
             $user->name = $data['name'];
         }
         if (isset($data['description'])) {
             $user->description = $data['description'];
         }
+        if (isset($data['website'])) {
+            $user->website = $data['website'];
+        }
+        if (isset($data['location'])) {
+            $user->location = $data['location'];
+        }
+        if (isset($data['industry'])) {
+            $user->industry = $data['industry'];
+        }
 
-        // Subir foto de perfil si viene
+        // Subir foto de perfil (usuario) o logo (empresa)
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
+            \Log::info('Archivo profile_picture recibido', ['original_name' => $file->getClientOriginalName()]);
             $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('profile_pictures', $filename, 'public');
             $user->profile_picture = $path;
         }
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            \Log::info('Archivo logo recibido', ['original_name' => $file->getClientOriginalName()]);
+            $filename = 'company_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('company_logos', $filename, 'public');
+            $user->logo = $path;
+        }
 
-        // Subir CV si viene
+        // Subir CV si viene (solo usuario)
         if ($request->hasFile('cv')) {
             $file = $request->file('cv');
             $path = $file->store('cvs', 'public');
             $user->cv = $path;
         }
 
+        // Si el usuario es empresa y cambia el nombre, actualizar en todos sus trabajos
+        if ($user->role === 'company' && isset($data['company_name'])) {
+            \App\Models\Job::where('user_id', $user->id)->update(['company' => $data['company_name']]);
+        }
+
         $user->save();
-        
         \Log::info('Usuario actualizado', ['user' => $user]);
         return response()->json($user);
+    }
+
+    /**
+     * Obtener perfil público de empresa por ID
+     */
+    public function getCompanyProfile($id)
+    {
+        $user = User::where('id', $id)->where('role', 'company')->firstOrFail();
+        // Solo exponer campos públicos
+        return response()->json([
+            'id' => $user->id,
+            'company_name' => $user->company_name,
+            'logo' => $user->logo,
+            'description' => $user->description,
+            'website' => $user->website,
+            'location' => $user->location,
+            'industry' => $user->industry,
+        ]);
     }
 }

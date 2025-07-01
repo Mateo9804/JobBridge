@@ -55,6 +55,13 @@ function Account() {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    if (user && user.role === 'company') {
+      navigate('/company/edit', { replace: true });
+      return;
+    }
+  }, [user, navigate]);
+
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0];
     setProfilePic(file);
@@ -107,8 +114,6 @@ function Account() {
   };
 
   if (loading) return (<><Header /><div className="account-page"><p>Cargando...</p></div></>);
-
-  console.log('profilePicUrl:', profilePicUrl);
 
   return (
     <>

@@ -130,7 +130,7 @@ function Header() {
               {userMenuOpen && (
                 <div className="user-dropdown-menu">
                   <Link to="/account" onClick={() => setUserMenuOpen(false)}>Página de la cuenta</Link>
-                  <Link to="/account/edit" onClick={() => setUserMenuOpen(false)}>Editar cuenta</Link>
+                  <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"} onClick={() => setUserMenuOpen(false)}>Editar cuenta</Link>
                   <button onClick={handleLogout} className="btn-logout-dropdown">Cerrar Sesión</button>
                 </div>
               )}
@@ -202,7 +202,7 @@ function Header() {
                   {userMenuOpen && (
                     <div className="user-dropdown-menu">
                       <Link to="/account" onClick={() => setUserMenuOpen(false)}>Página de la cuenta</Link>
-                      <Link to="/account/edit" onClick={() => setUserMenuOpen(false)}>Editar cuenta</Link>
+                      <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"} onClick={() => setUserMenuOpen(false)}>Editar cuenta</Link>
                       <button onClick={handleLogout} className="btn-logout-dropdown">Cerrar Sesión</button>
                     </div>
                   )}

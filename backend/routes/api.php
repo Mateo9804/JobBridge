@@ -76,3 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'getProfile']);
     Route::post('/profile', [AuthController::class, 'updateProfile']);
 });
+
+// Ruta pública para ver perfil de empresa
+Route::get('/company/{id}/profile', [AuthController::class, 'getCompanyProfile']);

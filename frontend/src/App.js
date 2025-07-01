@@ -14,6 +14,8 @@ import Account from './components/Account';
 import Header from './components/Header';
 import { API_ENDPOINTS } from './config/api';
 import './App.css';
+import CompanyProfile from './components/CompanyProfile';
+import EditCompanyProfile from './components/EditCompanyProfile';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/account" element={<AccountView />} />
             <Route path="/account/edit" element={<Account />} />
+            <Route path="/company/:id" element={<CompanyProfile />} />
+            <Route path="/company/edit" element={<EditCompanyProfile />} />
           </Routes>
         </div>
       </Router>
