@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import AuthModal from './AuthModal';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, useNotification } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import './Companies.css';
 
@@ -35,6 +35,7 @@ function Companies() {
   
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { addNotification } = useNotification();
 
   // Opciones predefinidas para títulos de puestos
   const jobTitles = [
@@ -177,6 +178,7 @@ function Companies() {
 
       if (response.ok) {
         setSuccess('¡Oferta creada exitosamente!');
+        addNotification('¡Has publicado una nueva oferta de empleo!');
         setShowCreateForm(false);
         setSelectedSkills([]);
         fetchJobs();

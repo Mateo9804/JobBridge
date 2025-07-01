@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, useNotification } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import './JobApplication.css';
 

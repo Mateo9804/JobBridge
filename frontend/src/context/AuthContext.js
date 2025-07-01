@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
+const NotificationContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -8,6 +9,35 @@ export const useAuth = () => {
     throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   }
   return context;
+};
+
+export const useNotification = () => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotification debe ser usado dentro de un NotificationProvider');
+  }
+  return context;
+};
+
+export const NotificationProvider = ({ children }) => {
+  const [notifications, setNotifications] = useState([]);
+  const addNotification = (message) => {
+    setNotifications(prev => [
+      { id: Date.now(), message, read: false, date: new Date() },
+      ...prev
+    ]);
+  };
+  const deleteNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+  return (
+    <NotificationContext.Provider value={{ notifications, addNotification, deleteNotification, markAllAsRead }}>
+      {children}
+    </NotificationContext.Provider>
+  );
 };
 
 export const AuthProvider = ({ children }) => {
@@ -48,6 +78,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser,
     token,
     login,
     logout,
@@ -57,7 +88,9 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      <NotificationProvider>
+        {children}
+      </NotificationProvider>
     </AuthContext.Provider>
   );
 }; 

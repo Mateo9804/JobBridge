@@ -78,7 +78,11 @@ function AccountView() {
         <div className="profile-pic-section">
           <div className="profile-pic-wrapper">
             <img
-              src={profile.profile_picture ? `/storage/${profile.profile_picture}` : '/imagenes/iconoUsuario.png'}
+              src={
+                profile.profile_picture
+                  ? `http://localhost/jobbrige/backend/public/storage/${profile.profile_picture}?t=${Date.now()}`
+                  : '/imagenes/iconoUsuario.png'
+              }
               alt="Foto de perfil"
               className="profile-pic"
             />
@@ -93,12 +97,24 @@ function AccountView() {
             <label>Descripción:</label>
             <span>{profile.description || 'Sin descripción'}</span>
           </div>
+          {profile.cv && (
+            <div className="account-info-row">
+              <label>CV:</label>
+              <a
+                href={`http://localhost/jobbrige/backend/public/storage/${profile.cv}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="upload-cv-btn"
+                download
+              >
+                Descargar CV
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </>
   );
 }
-
-function EmptyAccount() { return <></>; }
 
 export default App;

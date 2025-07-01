@@ -145,7 +145,8 @@ class AuthController extends Controller
         // Subir foto de perfil si viene
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
-            $path = $file->store('profile_pictures', 'public');
+            $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_pictures', $filename, 'public');
             $user->profile_picture = $path;
         }
 
@@ -157,6 +158,8 @@ class AuthController extends Controller
         }
 
         $user->save();
+        
+        \Log::info('Usuario actualizado', ['user' => $user]);
         return response()->json($user);
     }
 }

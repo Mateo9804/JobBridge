@@ -18,6 +18,13 @@ function Account() {
   const fileInputRef = useRef();
   const cvInputRef = useRef();
 
+  // Variable para el nombre completo de la imagen de perfil
+  const profilePicUrl = previewPic
+    ? previewPic
+    : (user?.profile_picture
+        ? `http://localhost/jobbrige/backend/public/storage/${user.profile_picture}?t=${Date.now()}`
+        : '/imagenes/iconoUsuario.png');
+
   // Cargar datos reales al montar
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,6 +46,7 @@ function Account() {
           setPreviewPic(data.profile_picture ? `/storage/${data.profile_picture}` : null);
           setCvFile(data.cv ? { name: data.cv.split('/').pop() } : null);
           if (setUser) setUser(data);
+          localStorage.setItem('user', JSON.stringify(data));
         }
       } catch (e) {}
       setLoading(false);
@@ -85,6 +93,7 @@ function Account() {
       if (res.ok) {
         const data = await res.json();
         if (setUser) setUser(data);
+        localStorage.setItem('user', JSON.stringify(data));
         setPreviewPic(data.profile_picture ? `/storage/${data.profile_picture}` : null);
         setCvFile(data.cv ? { name: data.cv.split('/').pop() } : null);
         alert('Perfil actualizado');
@@ -99,6 +108,8 @@ function Account() {
 
   if (loading) return (<><Header /><div className="account-page"><p>Cargando...</p></div></>);
 
+  console.log('profilePicUrl:', profilePicUrl);
+
   return (
     <>
       <Header />
@@ -108,7 +119,7 @@ function Account() {
           <div className="profile-pic-section">
             <div className="profile-pic-wrapper">
               <img
-                src={previewPic || '/imagenes/iconoUsuario.png'}
+                src={profilePicUrl}
                 alt="Foto de perfil"
                 className="profile-pic"
               />

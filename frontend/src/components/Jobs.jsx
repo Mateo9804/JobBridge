@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import AuthModal from './AuthModal';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, useNotification } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import './Jobs.css';
 
@@ -15,6 +15,7 @@ function Jobs() {
   
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     const fetchJobs = async () => {

@@ -472,4 +472,103 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Notificaciones */
+.notification-btn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.15s;
+}
+
+.notification-btn.notif-anim {
+  animation: notif-bounce 0.7s cubic-bezier(.36,1.5,.64,1) 1;
+}
+
+@keyframes notif-bounce {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.2) rotate(-10deg); }
+  40% { transform: scale(0.95) rotate(8deg); }
+  60% { transform: scale(1.1) rotate(-6deg); }
+  80% { transform: scale(0.98) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.notification-btn.notif-bounce-click {
+  animation: notif-bounce-click 0.5s cubic-bezier(.36,1.5,.64,1) 1;
+}
+
+@keyframes notif-bounce-click {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.18) rotate(-8deg); }
+  40% { transform: scale(0.92) rotate(6deg); }
+  60% { transform: scale(1.08) rotate(-4deg); }
+  80% { transform: scale(0.98) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.notif-dropdown-menu {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  min-width: 260px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  z-index: 100;
+  padding: 8px 0 8px 0;
+  max-height: 320px;
+  overflow-y: auto;
+  animation: notif-fade-in 0.2s;
+}
+
+@keyframes notif-fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font-size: 0.97rem;
+  border-bottom: 1px solid #f2f2f2;
+  transition: background 0.15s;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item span {
+  flex: 1;
+  color: #333;
+}
+
+.notif-delete-btn {
+  background: none;
+  border: none;
+  color: #e53935;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.notif-delete-btn:hover {
+  background: #ffeaea;
+}
+
+.notif-empty {
+  text-align: center;
+  color: #888;
+  padding: 18px 0 14px 0;
+  font-size: 0.98rem;
 } 

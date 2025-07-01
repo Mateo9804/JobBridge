@@ -19,7 +19,7 @@ function About() {
               JobBridge es una plataforma innovadora diseñada para conectar empresas con profesionales 
               del sector tecnológico. Nuestra misión es simplificar el proceso de contratación y 
               facilitar que las empresas encuentren el talento que necesitan, mientras que los 
-              profesionales descubren oportunidades que se alinean con sus habilidades y aspiraciones.
+              profesionales descubran oportunidades que se alinean con sus habilidades y aspiraciones.
             </p>
           </section>
 
