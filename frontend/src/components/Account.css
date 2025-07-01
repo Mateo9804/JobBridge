@@ -1,0 +1,148 @@
+.account-page {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+  padding: 32px 28px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.account-page h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #222;
+}
+
+.account-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.profile-pic-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.profile-pic-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-pic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #007AFF;
+  box-shadow: 0 2px 12px rgba(0,122,255,0.08);
+  background: #f2f2f2;
+}
+
+.edit-pic-btn {
+  margin-top: 10px;
+  background: linear-gradient(90deg, #7f5fff 0%, #007AFF 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.edit-pic-btn:hover {
+  background: linear-gradient(90deg, #007AFF 0%, #7f5fff 100%);
+}
+
+.account-info-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.account-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.account-info-row label {
+  min-width: 90px;
+  font-weight: 600;
+  color: #222;
+}
+
+.account-info-row span {
+  color: #444;
+  font-size: 16px;
+}
+
+.upload-cv-btn {
+  background: #fff;
+  color: #007AFF;
+  border: 1.5px solid #007AFF;
+  border-radius: 8px;
+  padding: 6px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.upload-cv-btn:hover {
+  background: #007AFF;
+  color: #fff;
+}
+
+.cv-file-name {
+  margin-left: 10px;
+  color: #555;
+  font-size: 14px;
+}
+
+.description-textarea {
+  width: 100%;
+  min-height: 80px;
+  border-radius: 10px;
+  border: 1.5px solid #ececec;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: #222;
+  background: #fafbff;
+  resize: vertical;
+  box-shadow: 0 1.5px 6px rgba(0,122,255,0.04);
+  transition: border 0.2s;
+}
+.description-textarea:focus {
+  border: 1.5px solid #007AFF;
+  outline: none;
+}
+
+.save-account-btn {
+  margin-top: 18px;
+  background: linear-gradient(90deg, #7f5fff 0%, #007AFF 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 32px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(127, 95, 255, 0.08);
+  transition: background 0.2s;
+}
+.save-account-btn:hover {
+  background: linear-gradient(90deg, #007AFF 0%, #7f5fff 100%);
+} 

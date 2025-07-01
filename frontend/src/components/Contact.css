@@ -1,6 +1,6 @@
 .contact-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8f9fa;
 }
 
 .contact-container {
@@ -31,11 +31,12 @@
 }
 
 .contact-content {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin-bottom: 40px;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0;
 }
 
 .contact-grid {
@@ -69,38 +70,64 @@
 
 .contact-item {
   display: flex;
-  align-items: flex-start;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: white;
+  align-items: center;
+  gap: 1rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 1.5rem 2rem;
+  font-size: 1.1rem;
+  justify-content: center;
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: background 0.25s, color 0.25s, box-shadow 0.25s;
 }
 
 .contact-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  background: #007aff;
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(0,122,255,0.18);
 }
 
-.contact-icon {
+.contact-item.bg-blue {
+  background: #007aff;
+  color: #fff;
+}
+
+.contact-item.bg-blue:hover {
+  background: #339dff;
+  color: #fff;
+}
+
+.contact-item.bg-black {
+  background: #111;
+  color: #fff;
+}
+
+.contact-item.bg-black:hover {
+  background: #222;
+  color: #fff;
+}
+
+.contact-item .contact-icon {
   font-size: 2rem;
   margin-right: 20px;
   min-width: 50px;
   text-align: center;
+  transition: color 0.25s;
 }
 
-.contact-text h4 {
-  font-size: 1.2rem;
-  color: #2d3748;
-  margin-bottom: 8px;
-  font-weight: 600;
+.contact-item span,
+.contact-item a {
+  color: inherit;
+  font-weight: 500;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: color 0.25s;
 }
 
-.contact-text p {
-  color: #4a5568;
-  margin-bottom: 5px;
-  line-height: 1.5;
+.contact-item a:hover {
+  text-decoration: underline;
 }
 
 .social-links {
@@ -423,5 +450,33 @@
   .submit-btn {
     padding: 15px 25px;
     font-size: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .contact-content {
+    padding: 0;
+    max-width: 98vw;
+  }
+  .contact-info-section, .contact-form-section {
+    padding: 0 0.5rem;
+  }
+}
+@media (max-width: 600px) {
+  .contact-content {
+    margin: 1rem auto;
+  }
+}
+
+.contact-info-section, .contact-form-section {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0 2rem;
+}
+
+@media (max-width: 900px) {
+  .contact-info-section, .contact-form-section {
+    padding: 0 0.5rem;
   }
 } 

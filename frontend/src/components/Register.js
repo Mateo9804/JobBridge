@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
+import { API_ENDPOINTS } from '../config/api';
 import './Register.css';
 
 function Register() {
@@ -33,7 +34,7 @@ function Register() {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost/api/register', {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import AuthModal from './AuthModal';
 import { useAuth } from '../context/AuthContext';
+import { API_ENDPOINTS } from '../config/api';
 import './Companies.css';
 
 function Companies() {
@@ -121,7 +122,7 @@ function Companies() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
       
-      const response = await fetch('http://localhost/api/company/jobs', {
+      const response = await fetch(API_ENDPOINTS.COMPANY_JOBS, {
         signal: controller.signal
       });
       
@@ -168,7 +169,7 @@ function Companies() {
     console.log('Datos a enviar:', formToSend);
 
     try {
-      const response = await fetch('http://localhost/api/jobs', {
+      const response = await fetch(API_ENDPOINTS.JOBS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formToSend),
@@ -251,7 +252,7 @@ function Companies() {
     };
 
     try {
-      const response = await fetch(`http://localhost/api/jobs/${editingJob.id}`, {
+      const response = await fetch(`${API_ENDPOINTS.JOBS}/${editingJob.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formToSend),
@@ -286,7 +287,7 @@ function Companies() {
     setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
 
     try {
-      const response = await fetch(`http://localhost/api/jobs/${jobId}`, {
+      const response = await fetch(`${API_ENDPOINTS.JOBS}/${jobId}`, {
         method: 'DELETE',
       });
 

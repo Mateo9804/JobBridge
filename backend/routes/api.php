@@ -10,6 +10,14 @@ Route::get('/test', function () {
     return response()->json(['message' => 'API funcionando correctamente']);
 });
 
+Route::get('/cors-test', function () {
+    return response()->json([
+        'message' => 'CORS test successful',
+        'timestamp' => now(),
+        'headers' => request()->headers->all()
+    ]);
+});
+
 Route::get('/test-db', function () {
     try {
         \DB::connection()->getPdo();
@@ -62,3 +70,9 @@ Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
 
 // Rutas para aplicaciones
 Route::post('/applications', [ApplicationController::class, 'store']);
+
+// Rutas protegidas para perfil de usuario
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [AuthController::class, 'getProfile']);
+    Route::post('/profile', [AuthController::class, 'updateProfile']);
+});

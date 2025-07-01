@@ -1,147 +1,96 @@
 .application-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8f9fa;
 }
 
 .application-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.application-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #f0f0f0;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  max-width: 420px;
+  margin: 3rem auto;
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .application-header h1 {
-  color: #333;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  font-size: 2rem;
   font-weight: 700;
+  color: #222;
+  margin-bottom: 1.5rem;
 }
 
-.job-info {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 10px;
-  border-left: 4px solid #667eea;
-}
-
-.job-info h2 {
-  color: #333;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.job-info p {
-  color: #666;
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.application-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: #333;
-  font-size: 1rem;
-}
-
-.form-group input,
-.form-group textarea {
-  padding: 1rem;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #999;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid #f0f0f0;
-}
-
-.btn-primary,
-.btn-secondary {
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
+.application-header .job-info {
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.application-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+.application-form input,
+.application-form textarea {
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #f7fafc;
+  transition: border-color 0.3s;
 }
 
-.btn-primary:disabled {
-  opacity: 0.6;
+.application-form input:focus,
+.application-form textarea:focus {
+  border-color: #007AFF;
+  outline: none;
+}
+
+.application-form button[type="submit"] {
+  background: linear-gradient(90deg, #7f5fff 0%, #007AFF 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(127, 95, 255, 0.08);
+}
+
+.application-form button[type="submit"]:hover:not(:disabled) {
+  background: linear-gradient(90deg, #007AFF 0%, #7f5fff 100%);
+  box-shadow: 0 8px 24px rgba(0,122,255,0.13);
+}
+
+.application-form button[type="submit"]:disabled {
+  background: #ccc;
+  color: #888;
   cursor: not-allowed;
-  transform: none;
   box-shadow: none;
 }
 
-.btn-secondary {
-  background: #f8f9fa;
-  color: #333;
-  border: 2px solid #e1e5e9;
+.application-form .btn-secondary {
+  background: #e2e8f0;
+  color: #222;
+  border: none;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-.btn-secondary:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
+.application-form .btn-secondary:hover {
+  background: #cbd5e1;
 }
 
 .error-message {
@@ -150,46 +99,28 @@
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid #f5c6cb;
-  margin: 0;
+  margin: 1rem 0;
+  text-align: center;
+  font-weight: 500;
 }
 
 .success-message {
-  text-align: center;
-  padding: 2rem;
+  color: #155724;
   background: #d4edda;
+  padding: 1.2rem;
+  border-radius: 8px;
   border: 1px solid #c3e6cb;
-  border-radius: 10px;
-  color: #155724;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-weight: 500;
 }
 
-.success-message h3 {
-  color: #155724;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.success-message p {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
   .application-container {
     margin: 1rem;
     padding: 1.5rem;
   }
-  
   .application-header h1 {
-    font-size: 2rem;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .btn-primary,
-  .btn-secondary {
-    width: 100%;
+    font-size: 1.5rem;
   }
 } 

@@ -1,6 +1,6 @@
 .pricing-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8f9fa;
 }
 
 .pricing-container {
@@ -31,11 +31,12 @@
 }
 
 .pricing-content {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin-bottom: 40px;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0;
 }
 
 .plan-toggle {
@@ -120,19 +121,20 @@
 }
 
 .plan-card {
-  background: white;
+  background: #fff;
   border: 2px solid #e2e8f0;
   border-radius: 16px;
   padding: 30px;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease, box-shadow 0.3s;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .plan-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
+  box-shadow: 0 15px 35px rgba(0, 122, 255, 0.13);
+  border-color: #007AFF;
 }
 
 .plan-card.popular {
@@ -338,30 +340,51 @@
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
 }
 
 .info-item {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
   text-align: center;
-  padding: 30px 20px;
+  transition: box-shadow 0.3s, transform 0.3s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.info-item:hover {
+  box-shadow: 0 8px 32px rgba(0,122,255,0.13);
+  transform: translateY(-6px) scale(1.03);
 }
 
 .info-icon {
-  font-size: 3rem;
-  margin-bottom: 20px;
+  font-size: 2.7rem;
+  margin-bottom: 1.2rem;
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+
+.info-item:hover .info-icon {
+  transform: scale(1.18) rotate(-8deg);
 }
 
 .info-item h4 {
-  color: #2d3748;
-  font-size: 1.3rem;
-  margin-bottom: 15px;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.7rem;
 }
 
 .info-item p {
-  color: #4a5568;
+  color: #444;
+  font-size: 1.05rem;
   line-height: 1.6;
+  margin: 0;
 }
 
 .pricing-faq {
@@ -519,5 +542,18 @@
   
   .info-item h4 {
     font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .pricing-content {
+    padding: 0;
+    max-width: 98vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .pricing-content {
+    margin: 1rem auto;
   }
 } 

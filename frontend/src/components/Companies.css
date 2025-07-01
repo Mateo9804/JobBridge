@@ -1,6 +1,6 @@
 .companies-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8f9fa;
 }
 
 .companies-container {
@@ -61,10 +61,12 @@
 
 /* Panel de empresa */
 .companies-content {
-  background: white;
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0;
 }
 
 .companies-actions {
@@ -116,15 +118,17 @@
 }
 
 .job-card {
+  background: #fff;
   border: 2px solid #e1e5e9;
   border-radius: 10px;
   padding: 1.5rem;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .job-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-color: #007AFF;
+  box-shadow: 0 8px 32px rgba(0,122,255,0.13);
 }
 
 .job-header {
@@ -810,4 +814,16 @@
   color: #dc3545;
   font-size: 0.85rem;
   font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .companies-content {
+    padding: 0;
+    max-width: 98vw;
+  }
+}
+@media (max-width: 600px) {
+  .companies-content {
+    margin: 1rem auto;
+  }
 } 

@@ -116,4 +116,47 @@ class AuthController extends Controller
             'user' => $user,
         ]);
     }
+
+    /**
+     * Obtener el perfil del usuario autenticado
+     */
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+        return response()->json($user);
+    }
+
+    /**
+     * Actualizar el perfil del usuario autenticado
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+        $data = $request->only(['name', 'description']);
+
+        // Actualizar nombre y descripción
+        if (isset($data['name'])) {
+            $user->name = $data['name'];
+        }
+        if (isset($data['description'])) {
+            $user->description = $data['description'];
+        }
+
+        // Subir foto de perfil si viene
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $path = $file->store('profile_pictures', 'public');
+            $user->profile_picture = $path;
+        }
+
+        // Subir CV si viene
+        if ($request->hasFile('cv')) {
+            $file = $request->file('cv');
+            $path = $file->store('cvs', 'public');
+            $user->cv = $path;
+        }
+
+        $user->save();
+        return response()->json($user);
+    }
 }

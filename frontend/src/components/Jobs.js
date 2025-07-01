@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import AuthModal from './AuthModal';
 import { useAuth } from '../context/AuthContext';
+import { API_ENDPOINTS } from '../config/api';
 import './Jobs.css';
 
 function Jobs() {
@@ -18,7 +19,13 @@ function Jobs() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('http://localhost/api/jobs');
+        // Construir la query string con los filtros
+        const params = [];
+        if (selectedCategory !== 'todos') params.push(`category=${encodeURIComponent(selectedCategory)}`);
+        if (selectedExperience !== 'todos') params.push(`experience=${encodeURIComponent(selectedExperience)}`);
+        if (selectedLocation !== 'todos') params.push(`location=${encodeURIComponent(selectedLocation)}`);
+        const queryString = params.length > 0 ? `?${params.join('&')}` : '';
+        const response = await fetch(`${API_ENDPOINTS.JOBS}${queryString}`);
         if (response.ok) {
           const data = await response.json();
           setJobs(data);
@@ -29,12 +36,10 @@ function Jobs() {
     };
 
     fetchJobs();
-  }, []);
+  }, [selectedCategory, selectedExperience, selectedLocation]);
 
-  // Filtrar trabajos por ubicación
-  const filteredJobs = selectedLocation === 'todos' 
-    ? jobs 
-    : jobs.filter(job => job.location === selectedLocation);
+  // Ya no es necesario filtrar en frontend, solo mostrar jobs
+  const filteredJobs = jobs;
 
   const handleApply = (job) => {
     if (!isAuthenticated) {

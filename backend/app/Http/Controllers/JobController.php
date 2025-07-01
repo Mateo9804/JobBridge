@@ -43,20 +43,37 @@ class JobController extends Controller
     {
         try {
             Log::info('JobController@index called');
-            
-            // Si se solicita trabajos de una empresa específica
+
+            // Construir la consulta base
+            $query = Job::query();
+
+            // Filtrar por company_id si se pasa
             if ($request->has('company_id')) {
-                $jobs = Job::where('user_id', $request->company_id)->get();
-            } else {
-                // Mostrar todos los trabajos para la página de empleos
-                $jobs = Job::all();
+                $query->where('user_id', $request->company_id);
             }
-            
+
+            // Filtrar por categoría (tipo de trabajo)
+            if ($request->filled('category') && $request->category !== 'todos') {
+                $query->where('category', $request->category);
+            }
+
+            // Filtrar por experiencia
+            if ($request->filled('experience') && $request->experience !== 'todos') {
+                $query->where('experience', $request->experience);
+            }
+
+            // Filtrar por ubicación
+            if ($request->filled('location') && $request->location !== 'todos') {
+                $query->where('location', $request->location);
+            }
+
+            $jobs = $query->get();
+
             // Formatear cada job antes de devolver
             $formattedJobs = $jobs->map(function($job) {
                 return $this->formatJob($job);
             });
-            
+
             Log::info('Jobs retrieved successfully', ['count' => $jobs->count()]);
             return response()->json($formattedJobs);
         } catch (\Exception $e) {

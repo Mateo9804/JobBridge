@@ -14,13 +14,8 @@ function Home() {
           <h1>Encuentra tu trabajo ideal</h1>
           <p>Conectamos talento con oportunidades. JobBridge es la plataforma que une profesionales con las mejores empresas.</p>
           <div className="hero-buttons">
-            <Link to="/jobs" className="btn-primary">Buscar Empleos</Link>
-            <Link to="/register" className="btn-secondary">Crear Perfil</Link>
-          </div>
-        </div>
-        <div className="hero-image">
-          <div className="hero-placeholder">
-            <span>🚀</span>
+            <Link to="/jobs" className="home-btn-primary">Buscar Empleos</Link>
+            <Link to="/register" className="home-btn-secondary">Crear Perfil</Link>
           </div>
         </div>
       </section>
