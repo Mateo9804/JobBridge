@@ -135,11 +135,14 @@ class AuthController extends Controller
         \Log::info('Datos recibidos en updateProfile', $request->all());
         \Log::info('Archivos recibidos', $request->allFiles());
 
-        $data = $request->only(['name', 'description', 'website', 'location', 'industry']);
+        $data = $request->only(['name', 'company_name', 'description', 'website', 'location', 'industry']);
 
         // Actualizar campos comunes
         if (isset($data['name'])) {
             $user->name = $data['name'];
+        }
+        if (isset($data['company_name'])) {
+            $user->company_name = $data['company_name'];
         }
         if (isset($data['description'])) {
             $user->description = $data['description'];

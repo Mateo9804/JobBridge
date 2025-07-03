@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/test', function () {
     return response()->json(['message' => 'API funcionando correctamente']);
@@ -75,6 +76,13 @@ Route::post('/applications', [ApplicationController::class, 'store']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'getProfile']);
     Route::post('/profile', [AuthController::class, 'updateProfile']);
+
+    // Notificaciones del usuario autenticado
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 });
 
 // Ruta pública para ver perfil de empresa
