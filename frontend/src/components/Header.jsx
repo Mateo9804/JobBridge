@@ -14,6 +14,7 @@ function Header() {
   const userMenuRef = useRef(null);
   const notifMenuRef = useRef(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
 
   // Simular llegada de notificación (puedes borrar esto luego)
   // setTimeout(() => {
@@ -96,12 +97,12 @@ function Header() {
                 <span
                   className="dropdown-toggle-label"
                   tabIndex={0}
-                  style={{ display: 'inline-block', cursor: 'pointer', fontWeight: 700, padding: '8px 22px', borderRadius: '20px', color: '#fff', background: 'none', textDecoration: 'none' }}
+                  style={{ display: 'inline-block', cursor: 'pointer', fontWeight: 700, color: '#222', textDecoration: 'none' }}
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
                   Empresas
                 </span>
-                <div className="dropdown-menu-content" style={{ display: dropdownOpen ? 'block' : 'none' }}>
+                <div className="dropdown-menu-content">
                   <Link to="/companies" onClick={() => setDropdownOpen(false)}>Panel de Empresas</Link>
                   <Link to="/companies?tab=applications" onClick={() => setDropdownOpen(false)}>Panel de Solicitudes</Link>
                 </div>
@@ -149,6 +150,32 @@ function Header() {
       {mobileMenuOpen && (
         <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="mobile-menu" onClick={e => e.stopPropagation()}>
+            <div className="mobile-auth-dropdown">
+              {isAuthenticated() ? (
+                <div className="user-menu-wrapper" ref={userMenuRef} tabIndex={0}>
+                  <span
+                    className="user-dropdown-trigger"
+                    tabIndex={0}
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    style={{ color: '#222', fontWeight: 700, fontSize: '1.2rem', cursor: 'pointer', display: 'block', margin: '0 auto 12px auto', textAlign: 'center' }}
+                  >
+                    Hola, {user?.name}
+                  </span>
+                  {userMenuOpen && (
+                    <div className="user-dropdown-menu" style={{ position: 'static', background: 'none', boxShadow: 'none', minWidth: 'unset', margin: 0, padding: 0 }}>
+                      <Link to="/account" onClick={() => setMobileMenuOpen(false)}><span>Página de la cuenta</span></Link>
+                      <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"} onClick={() => setMobileMenuOpen(false)}><span>Editar cuenta</span></Link>
+                      <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="btn-logout-dropdown"><span>Cerrar Sesión</span></button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="mobile-auth-buttons" style={{ marginBottom: 16 }}>
+                  <Link to="/login" className="btn-login" onClick={() => setMobileMenuOpen(false)}>Iniciar Sesión</Link>
+                  <Link to="/register" className="btn-register" onClick={() => setMobileMenuOpen(false)}>Registrarse</Link>
+                </div>
+              )}
+            </div>
             <nav className="mobile-nav-menu">
               <ul>
                 <li><Link to="/">Home</Link></li>
@@ -157,23 +184,19 @@ function Header() {
                   <div
                     className="dropdown-menu-wrapper"
                     style={{ position: 'relative', display: 'inline-block' }}
-                    onMouseEnter={() => setDropdownOpen(true)}
-                    onMouseLeave={() => setDropdownOpen(false)}
-                    onFocus={() => setDropdownOpen(true)}
-                    onBlur={() => setDropdownOpen(false)}
+                    onClick={() => setMobileDropdownOpen(open => !open)}
                     tabIndex={0}
                   >
                     <span
                       className="dropdown-toggle-label"
                       tabIndex={0}
-                      style={{ display: 'inline-block', cursor: 'pointer', fontWeight: 700, padding: '8px 22px', borderRadius: '20px', color: '#fff', background: 'none', textDecoration: 'none' }}
-                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                      style={{ display: 'inline-block', cursor: 'pointer', fontWeight: 700, color: '#222', textDecoration: 'none' }}
                     >
                       Empresas
                     </span>
-                    <div className="dropdown-menu-content" style={{ display: dropdownOpen ? 'block' : 'none' }}>
-                      <Link to="/companies" onClick={() => setDropdownOpen(false)}>Panel de Empresas</Link>
-                      <Link to="/companies?tab=applications" onClick={() => setDropdownOpen(false)}>Panel de Solicitudes</Link>
+                    <div className="dropdown-menu-content" style={{ display: mobileDropdownOpen ? 'block' : 'none', position: 'static', background: 'none', boxShadow: 'none' }}>
+                      <Link to="/companies" onClick={() => setMobileDropdownOpen(false)}>Panel de Empresas</Link>
+                      <Link to="/companies?tab=applications" onClick={() => setMobileDropdownOpen(false)}>Panel de Solicitudes</Link>
                     </div>
                   </div>
                 </li>
@@ -182,33 +205,6 @@ function Header() {
                 <li><Link to="/contact">Contacto</Link></li>
               </ul>
             </nav>
-            <div className="mobile-auth-buttons">
-              {isAuthenticated() ? (
-                <div
-                  className="user-menu-wrapper"
-                  ref={userMenuRef}
-                  tabIndex={0}
-                >
-                  <span
-                    className="user-dropdown-trigger"
-                    tabIndex={0}
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  >
-                    Hola, {user?.name}
-                  </span>
-                  <div className="user-dropdown-menu">
-                    <Link to="/account"><span>Página de la cuenta</span></Link>
-                    <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"}><span>Editar cuenta</span></Link>
-                    <button onClick={handleLogout} className="btn-logout-dropdown"><span>Cerrar Sesión</span></button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <Link to="/login" className="btn-login">Iniciar Sesión</Link>
-                  <Link to="/register" className="btn-register">Registrarse</Link>
-                </>
-              )}
-            </div>
           </div>
         </div>
       )}

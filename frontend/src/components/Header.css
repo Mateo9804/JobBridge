@@ -6,6 +6,7 @@
   top: 0;
   z-index: 1000;
   transition: box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: visible !important;
 }
 
 .header-container {
@@ -17,6 +18,7 @@
   justify-content: center;
   height: 56px;
   gap: 32px;
+  overflow: visible !important;
 }
 
 .logo {
@@ -53,6 +55,7 @@
   display: flex;
   align-items: center;
   gap: 32px;
+  overflow: visible !important;
 }
 
 .nav-menu ul {
@@ -62,6 +65,7 @@
   padding: 0;
   gap: 32px;
   align-items: center;
+  overflow: visible !important;
 }
 
 .nav-menu li {
@@ -81,6 +85,7 @@
   display: flex;
   align-items: center;
   white-space: nowrap;
+  overflow: visible !important;
 }
 
 .nav-menu a:hover, .nav-menu a:focus,
@@ -95,6 +100,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  overflow: visible !important;
 }
 
 .user-menu {
@@ -105,6 +111,7 @@
   border: none;
   box-shadow: none;
   padding: 0;
+  overflow: visible !important;
 }
 
 .user-name {
@@ -115,6 +122,7 @@
   padding: 6px 10px;
   border-radius: 8px;
   white-space: nowrap;
+  overflow: visible !important;
 }
 
 .btn-login, .btn-register {
@@ -129,6 +137,7 @@
   justify-content: center;
   transition: background 0.2s, color 0.2s;
   box-sizing: border-box;
+  overflow: visible !important;
 }
 
 .btn-login {
@@ -263,6 +272,59 @@
   .mobile-menu-toggle {
     display: flex;
   }
+  .mobile-menu .dropdown-toggle-label,
+  .mobile-menu-open .dropdown-toggle-label,
+  .dropdown-toggle-label {
+    color: #222 !important;
+  }
+  .dropdown-toggle-label:hover,
+  .dropdown-menu-wrapper:focus-within .dropdown-toggle-label,
+  .dropdown-menu-wrapper[aria-expanded="true"] .dropdown-toggle-label {
+    color: #222 !important;
+    background: #0d2233 !important;
+    padding: 12px 32px !important;
+    border-radius: 24px !important;
+  }
+  .dropdown-menu-content a {
+    color: #222 !important;
+    background: none !important;
+  }
+  .dropdown-menu-content a:hover {
+    background: #007bff !important;
+    color: #fff !important;
+  }
+  .mobile-menu .user-dropdown-menu a,
+  .mobile-menu .user-dropdown-menu button {
+    color: #222 !important;
+    background: none !important;
+    border-radius: 12px !important;
+    padding: 10px 12px !important;
+    transition: background 0.2s, color 0.2s;
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+  .mobile-menu .user-dropdown-menu a:hover,
+  .mobile-menu .user-dropdown-menu button:hover {
+    background: #0d2233 !important;
+    color: #fff !important;
+  }
+  .mobile-menu .user-dropdown-menu a {
+    background: none !important;
+  }
+  .mobile-menu .user-dropdown-trigger {
+    color: #222 !important;
+  }
+  .user-dropdown-trigger:hover,
+  .user-menu-wrapper:focus-within .user-dropdown-trigger,
+  .user-menu-wrapper[aria-expanded="true"] .user-dropdown-trigger {
+    color: #222 !important;
+    background: #0d2233 !important;
+    border-radius: 24px !important;
+  }
 }
 
 /* Focus States for Accessibility */
@@ -345,14 +407,14 @@
   font-size: 1.15rem;
   font-weight: 500;
   text-decoration: none;
-  padding: 8px 0;
-  border-radius: 6px;
+  padding: 12px 32px;
+  border-radius: 24px;
   transition: background 0.2s, color 0.2s;
 }
 
 .mobile-nav-menu a:hover {
-  background: #f2f2f2;
-  color: #007AFF;
+  background: #0d2233 !important;
+  color: #fff !important;
 }
 
 .mobile-auth-buttons {
@@ -395,6 +457,7 @@
 .user-menu-wrapper {
   position: relative;
   display: inline-block;
+  overflow: visible !important;
 }
 
 .user-dropdown-trigger {
@@ -407,17 +470,20 @@
   border-radius: 14px;
   cursor: pointer;
   text-decoration: none;
-  transition: color 0.2s, text-decoration 0.2s;
+  transition: color 0.2s, text-decoration 0.2s, background 0.2s;
   display: inline-block;
+  overflow: visible !important;
 }
 
 .user-dropdown-trigger:hover,
 .user-menu-wrapper:focus-within .user-dropdown-trigger {
+  background: #0d2233 !important;
   color: #fff !important;
   text-decoration: underline !important;
   text-decoration-color: #fff !important;
   text-underline-offset: 4px !important;
-  background: none !important;
+  border-radius: 14px !important;
+  overflow: visible !important;
 }
 
 .user-dropdown-menu {
@@ -432,6 +498,7 @@
   z-index: 9999;
   margin-top: 0;
   padding: 8px 8px;
+  overflow: visible !important;
 }
 
 .user-menu-wrapper:hover .user-dropdown-menu,
@@ -452,6 +519,7 @@
   text-align: left;
   width: 100%;
   cursor: pointer;
+  overflow: visible !important;
 }
 
 .user-dropdown-menu a:hover, .user-dropdown-menu button:hover {
@@ -582,18 +650,20 @@
 .dropdown-menu-wrapper {
   position: relative;
   display: inline-block;
+  overflow: visible !important;
 }
 .dropdown-toggle-label {
-  color: #222;
+  color: #fff !important;
   text-decoration: none;
   font-weight: 500 !important;
   font-size: 16px;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 8px 22px;
+  border-radius: 14px;
   background: none;
   transition: background 0.2s, color 0.2s;
   display: inline-block;
   white-space: nowrap;
+  overflow: visible !important;
 }
 .dropdown-toggle-label:hover,
 .dropdown-menu-wrapper:hover .dropdown-toggle-label,
@@ -618,7 +688,8 @@
   border-radius: 8px;
   z-index: 9999;
   margin-top: 0;
-  padding: 8px 0;
+  padding: 8px 8px;
+  overflow: visible !important;
 }
 .dropdown-menu-wrapper:hover .dropdown-menu-content,
 .dropdown-menu-wrapper:focus-within .dropdown-menu-content,
@@ -639,24 +710,9 @@
   color: #fff !important;
 }
 
-.user-dropdown-trigger {
-  color: #fff !important;
-  background: none !important;
-  border: none !important;
-  font-weight: 500;
-  font-size: 16px;
-  padding: 8px 22px;
-  border-radius: 14px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.2s, text-decoration 0.2s;
-  display: inline-block;
-}
-.user-dropdown-trigger:hover,
-.user-menu-wrapper:focus-within .user-dropdown-trigger {
-  color: #fff !important;
-  text-decoration: underline !important;
-  text-decoration-color: #fff !important;
-  text-underline-offset: 4px !important;
-  background: none !important;
+@media (prefers-color-scheme: dark) {
+  .mobile-nav-menu a:hover {
+    background: #0d2233 !important;
+    color: #fff !important;
+  }
 } 
