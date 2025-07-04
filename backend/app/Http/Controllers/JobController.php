@@ -207,6 +207,7 @@ class JobController extends Controller
             
             $job = Job::create($jobData);
             
+            \App\Models\Notification::createForUser($userId, 'job_created', 'Has publicado un nuevo trabajo: ' . $job->title);
             Log::info('Job created successfully', ['job_id' => $job->id]);
             return response()->json($this->formatJob($job), 201);
         } catch (\Exception $e) {
@@ -287,6 +288,7 @@ class JobController extends Controller
             
             $job->delete();
             
+            \App\Models\Notification::createForUser($job->user_id, 'job_deleted', 'Has eliminado el trabajo: ' . $job->title);
             Log::info('Job deleted successfully', ['job_id' => $job->id]);
             return response()->json(['message' => 'Job deleted successfully']);
         } catch (\Exception $e) {

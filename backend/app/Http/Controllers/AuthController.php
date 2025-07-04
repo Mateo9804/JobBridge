@@ -186,6 +186,7 @@ class AuthController extends Controller
         }
 
         $user->save();
+        \App\Models\Notification::createForUser($user->id, 'profile_update', 'Tu perfil ha sido actualizado correctamente.');
         \Log::info('Usuario actualizado', ['user' => $user]);
         return response()->json($user);
     }
