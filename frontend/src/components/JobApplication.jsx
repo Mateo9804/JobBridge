@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
 import { useAuth, useNotification } from '../context/AuthContext';
@@ -14,10 +14,31 @@ function JobApplication() {
   const [form, setForm] = useState({
     cover_letter: '',
     experience: '',
+    cv: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+
+  useEffect(() => {
+    const checkAlreadyApplied = async () => {
+      const token = localStorage.getItem('token');
+      if (!token || !job) return;
+      try {
+        const response = await fetch(`${API_ENDPOINTS.USER_APPLICATIONS}?job_id=${job.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setAlreadyApplied(true);
+          }
+        }
+      } catch (e) {}
+    };
+    checkAlreadyApplied();
+  }, [job]);
 
   if (!job) {
     return (
@@ -34,7 +55,12 @@ function JobApplication() {
   }
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === 'cv') {
+      setForm({ ...form, cv: files[0] });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -43,17 +69,24 @@ function JobApplication() {
     setError('');
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No estás autenticado. Por favor, inicia sesión.');
+        setLoading(false);
+        return;
+      }
+      const formData = new FormData();
+      formData.append('job_id', job.id);
+      formData.append('cover_letter', form.cover_letter);
+      formData.append('experience', form.experience);
+      if (form.cv) {
+        formData.append('cv', form.cv);
+      }
       const response = await fetch(API_ENDPOINTS.APPLICATIONS, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          job_id: job.id,
-          cover_letter: form.cover_letter,
-          experience: form.experience,
-        }),
+        body: formData,
       });
       if (response.ok) {
         setSuccess(true);
@@ -61,11 +94,12 @@ function JobApplication() {
           navigate('/jobs');
         }, 2000);
       } else {
-        const data = await response.json();
-        setError(data.message || 'Error al enviar la postulación.');
+        const data = await response.json().catch(() => ({}));
+        setError(data.message || data.errors || 'Error al enviar la postulación.');
       }
     } catch (err) {
-      setError('Error de conexión.');
+      console.error('Error al enviar aplicación:', err);
+      setError('Error de conexión. Por favor, verifica tu conexión a internet.');
     } finally {
       setLoading(false);
     }
@@ -85,14 +119,18 @@ function JobApplication() {
         </div>
         {success ? (
           <div className="success-message">
-            <h3>¡Aplicación Enviada!</h3>
+            <h3>¡Aplicación enviada!</h3>
             <p>Tu postulación ha sido enviada correctamente.</p>
             <p>Redirigiendo a la página de empleos...</p>
+          </div>
+        ) : alreadyApplied ? (
+          <div className="error-message">
+            Ya has enviado una postulación para este trabajo.
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="application-form">
             <div className="form-group">
-              <label htmlFor="cover_letter">Carta de Presentación *</label>
+              <label htmlFor="cover_letter">Carta de presentación</label>
               <textarea
                 id="cover_letter"
                 name="cover_letter"
@@ -104,7 +142,7 @@ function JobApplication() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="experience">Experiencia Relevante *</label>
+              <label htmlFor="experience">Experiencia relevante</label>
               <textarea
                 id="experience"
                 name="experience"
@@ -115,13 +153,23 @@ function JobApplication() {
                 required
               />
             </div>
+            <div className="form-group">
+              <label htmlFor="cv">Adjuntar CV (opcional)</label>
+              <input
+                type="file"
+                id="cv"
+                name="cv"
+                accept=".pdf,.doc,.docx,.odt,.txt"
+                onChange={handleChange}
+              />
+            </div>
             {error && <p className="error-message">{error}</p>}
             <div className="form-actions">
               <button type="button" onClick={() => navigate('/jobs')} className="btn-secondary">
                 Cancelar
               </button>
-              <button type="submit" className="btn-primary" disabled={loading}>
-                {loading ? 'Enviando...' : 'Enviar Aplicación'}
+              <button type="submit" className="btn-primary" disabled={loading || alreadyApplied}>
+                {loading ? 'Enviando...' : 'Enviar aplicación'}
               </button>
             </div>
           </form>

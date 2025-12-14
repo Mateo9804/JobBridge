@@ -1,40 +1,24 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, useNotification } from '../context/AuthContext';
+import AuthModal from './AuthModal';
 import './Header.css';
 
 function Header() {
   const { user, isAuthenticated, logout } = useAuth();
-  const { notifications, addNotification, deleteNotification, markAllAsRead } = useNotification();
+  const { notifications, addNotification, deleteNotification, markAllAsRead, notifAnim } = useNotification();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifMenuOpen, setNotifMenuOpen] = useState(false);
-  const [notifAnim, setNotifAnim] = useState(false);
-  const [notifClickAnim, setNotifClickAnim] = useState(false);
   const userMenuRef = useRef(null);
   const notifMenuRef = useRef(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('login'); // 'login' o 'register'
 
-  // Simular llegada de notificación (puedes borrar esto luego)
-  // setTimeout(() => {
-  //   setNotifications((prev) => [
-  //     { id: Date.now(), message: 'Nueva notificación de ejemplo', read: false, date: new Date() },
-  //     ...prev
-  //   ]);
-  //   setNotifAnim(true);
-  // }, 10000);
-
-  // Animación al llegar notificación
-  React.useEffect(() => {
-    if (notifications.length > 0 && notifications.some(n => !n.read)) {
-      setNotifAnim(true);
-      const timer = setTimeout(() => setNotifAnim(false), 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [notifications]);
-
-  // Cerrar el menú si se hace click fuera
   React.useEffect(() => {
     function handleClickOutside(event) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -60,11 +44,7 @@ function Header() {
 
   const handleNotifClick = () => {
     setNotifMenuOpen((open) => !open);
-    setNotifAnim(false);
     markAllAsRead();
-    setNotifClickAnim(false);
-    setTimeout(() => setNotifClickAnim(true), 10);
-    setTimeout(() => setNotifClickAnim(false), 700);
   };
 
   const handleDeleteNotif = (id) => {
@@ -84,14 +64,13 @@ function Header() {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/jobs">Empleos</Link></li>
+            <li><Link to="/courses">Cursos</Link></li>
             <li>
               <div
                 className="dropdown-menu-wrapper"
                 style={{ position: 'relative', display: 'inline-block' }}
                 onMouseEnter={() => setDropdownOpen(true)}
                 onMouseLeave={() => setDropdownOpen(false)}
-                onFocus={() => setDropdownOpen(true)}
-                onBlur={() => setDropdownOpen(false)}
                 tabIndex={0}
               >
                 <span
@@ -103,8 +82,8 @@ function Header() {
                   Empresas
                 </span>
                 <div className="dropdown-menu-content">
-                  <Link to="/companies" onClick={() => setDropdownOpen(false)}>Panel de Empresas</Link>
-                  <Link to="/companies?tab=applications" onClick={() => setDropdownOpen(false)}>Panel de Solicitudes</Link>
+                  <Link to="/companies" onClick={() => setDropdownOpen(false)}>Panel de empresas</Link>
+                  <Link to="/companies?tab=applications" onClick={() => setDropdownOpen(false)}>Panel de solicitudes</Link>
                 </div>
               </div>
             </li>
@@ -116,28 +95,108 @@ function Header() {
         
         <div className="auth-buttons">
           {isAuthenticated() ? (
-            <div
-              className="user-menu-wrapper"
-              ref={userMenuRef}
-              tabIndex={0}
-            >
-              <span
-                className="user-dropdown-trigger"
+            <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+              <div
+                className="user-menu-wrapper"
+                ref={userMenuRef}
                 tabIndex={0}
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                style={{ display: 'inline-block', position: 'relative', marginRight: '12px' }}
               >
-                Hola, {user?.name}
-              </span>
-              <div className="user-dropdown-menu">
-                <Link to="/account"><span>Página de la cuenta</span></Link>
-                <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"}><span>Editar cuenta</span></Link>
-                <button onClick={handleLogout} className="btn-logout-dropdown"><span>Cerrar Sesión</span></button>
+                <span
+                  className="user-dropdown-trigger"
+                  tabIndex={0}
+                  style={{ display: 'inline-flex', alignItems: 'center', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  onClick={() => {
+                    setUserMenuOpen((open) => !open);
+                    setNotifMenuOpen(false);
+                  }}
+                >
+                  {user?.name}
+                </span>
+                {userMenuOpen && (
+                  <div className="user-dropdown-menu" style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, zIndex: 9999 }}>
+                    <Link to="/account"><span>Página de la cuenta</span></Link>
+                    <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"}><span>Editar cuenta</span></Link>
+                    <button onClick={handleLogout} className="btn-logout-dropdown"><span>Cerrar sesión</span></button>
+                  </div>
+                )}
+              </div>
+              <div
+                className="notif-menu-wrapper"
+                tabIndex={0}
+                style={{ display: 'inline-block', position: 'relative' }}
+              >
+                <span
+                  className={`notification-btn${notifAnim ? ' notif-anim' : ''}`}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginLeft: 0, display: 'flex', alignItems: 'center', position: 'relative' }}
+                  aria-label="Notificaciones"
+                  onClick={() => {
+                    setNotifMenuOpen((open) => !open);
+                    setUserMenuOpen(false);
+                  }}
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+                    <path d="M18 16v-5c0-3.07-1.63-5.64-5-6.32V4a1 1 0 1 0-2 0v.68C7.63 5.36 6 7.92 6 11v5l-1 1v1h14v-1l-1-1zm-6 6c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2z"/>
+                  </svg>
+                  {notifications.filter(n => !n.read).length > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: -4,
+                      right: -4,
+                      background: '#e53935',
+                      color: '#fff',
+                      borderRadius: '50%',
+                      minWidth: 18,
+                      height: 18,
+                      fontSize: 12,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 'bold',
+                      boxShadow: '0 0 0 2px #fff',
+                      zIndex: 2
+                    }}>
+                      {notifications.filter(n => !n.read).length}
+                    </span>
+                  )}
+                </span>
+                {notifMenuOpen && (
+                  <div className="notif-dropdown-menu" style={{ right: 0, left: 'auto', minWidth: 260, top: 'calc(100% + 8px)', position: 'absolute', zIndex: 10000 }}>
+                    {notifications.length === 0 ? (
+                      <div className="notif-empty">No tienes notificaciones.</div>
+                    ) : (
+                      notifications.map(n => (
+                        <div key={n.id} className={`notif-item${!n.read ? ' notif-unread' : ''}`}
+                          style={{ background: !n.read ? '#eaf3ff' : 'transparent', fontWeight: !n.read ? 'bold' : 'normal' }}>
+                          <span>{n.message}</span>
+                          <button className="notif-delete-btn" onClick={() => handleDeleteNotif(n.id)} title="Eliminar notificación">×</button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
             <>
-              <Link to="/login" className="btn-login">Iniciar Sesión</Link>
-              <Link to="/register" className="btn-register">Registrarse</Link>
+              <button 
+                className="btn-login" 
+                onClick={() => {
+                  setAuthModalMode('login');
+                  setAuthModalOpen(true);
+                }}
+              >
+                Iniciar sesión
+              </button>
+              <button 
+                className="btn-register" 
+                onClick={() => {
+                  setAuthModalMode('register');
+                  setAuthModalOpen(true);
+                }}
+              >
+                Registrarse
+              </button>
             </>
           )}
         </div>
@@ -156,23 +215,44 @@ function Header() {
                   <span
                     className="user-dropdown-trigger"
                     tabIndex={0}
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
                     style={{ color: '#222', fontWeight: 700, fontSize: '1.2rem', cursor: 'pointer', display: 'block', margin: '0 auto 12px auto', textAlign: 'center' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUserMenuOpen((open) => !open);
+                    }}
                   >
-                    Hola, {user?.name}
+                    {user?.name}
                   </span>
                   {userMenuOpen && (
                     <div className="user-dropdown-menu" style={{ position: 'static', background: 'none', boxShadow: 'none', minWidth: 'unset', margin: 0, padding: 0 }}>
-                      <Link to="/account" onClick={() => setMobileMenuOpen(false)}><span>Página de la cuenta</span></Link>
-                      <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"} onClick={() => setMobileMenuOpen(false)}><span>Editar cuenta</span></Link>
-                      <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="btn-logout-dropdown"><span>Cerrar Sesión</span></button>
+                      <Link to="/account" onClick={() => { setMobileMenuOpen(false); setUserMenuOpen(false); }}><span>Ver perfil</span></Link>
+                      <Link to={user?.role === 'company' ? "/company/edit" : "/account/edit"} onClick={() => { setMobileMenuOpen(false); setUserMenuOpen(false); }}><span>Editar perfil</span></Link>
+                      <button onClick={(e) => { e.preventDefault(); handleLogout(); setMobileMenuOpen(false); setUserMenuOpen(false); }} className="btn-logout-dropdown"><span>Cerrar sesión</span></button>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="mobile-auth-buttons" style={{ marginBottom: 16 }}>
-                  <Link to="/login" className="btn-login" onClick={() => setMobileMenuOpen(false)}>Iniciar Sesión</Link>
-                  <Link to="/register" className="btn-register" onClick={() => setMobileMenuOpen(false)}>Registrarse</Link>
+                  <button 
+                    className="btn-login" 
+                    onClick={() => {
+                      setAuthModalMode('login');
+                      setAuthModalOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Iniciar sesión
+                  </button>
+                  <button 
+                    className="btn-register" 
+                    onClick={() => {
+                      setAuthModalMode('register');
+                      setAuthModalOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Registrarse
+                  </button>
                 </div>
               )}
             </div>
@@ -180,6 +260,7 @@ function Header() {
               <ul>
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/jobs">Empleos</Link></li>
+                <li><Link to="/courses">Cursos</Link></li>
                 <li>
                   <div
                     className="dropdown-menu-wrapper"
@@ -195,8 +276,8 @@ function Header() {
                       Empresas
                     </span>
                     <div className="dropdown-menu-content" style={{ display: mobileDropdownOpen ? 'block' : 'none', position: 'static', background: 'none', boxShadow: 'none' }}>
-                      <Link to="/companies" onClick={() => setMobileDropdownOpen(false)}>Panel de Empresas</Link>
-                      <Link to="/companies?tab=applications" onClick={() => setMobileDropdownOpen(false)}>Panel de Solicitudes</Link>
+                      <Link to="/companies" onClick={() => setMobileDropdownOpen(false)}>Panel de empresas</Link>
+                      <Link to="/companies?tab=applications" onClick={() => setMobileDropdownOpen(false)}>Panel de solicitudes</Link>
                     </div>
                   </div>
                 </li>
@@ -208,6 +289,12 @@ function Header() {
           </div>
         </div>
       )}
+      
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)}
+        initialMode={authModalMode}
+      />
     </header>
   );
 }

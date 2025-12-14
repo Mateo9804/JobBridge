@@ -48,12 +48,17 @@ function EditCompanyProfile() {
           setForm({
             name: data.name || '',
             company_name: data.company_name || '',
-            logo: data.logo || '',
+            logo: '',
             description: data.description || '',
             website: data.website || '',
             location: data.location || '',
           });
-          setLogoPreview(data.logo ? `/storage/${data.logo}` : DEFAULT_LOGO);
+          const storageBase = `${window.location.origin}/jobbrige/backend/public/storage/profile_pictures`;
+          setLogoPreview(
+            data.profile_picture
+              ? `${storageBase}/${data.profile_picture}?t=${Date.now()}`
+              : DEFAULT_LOGO
+          );
         }
       } catch (e) {}
       setLoading(false);
@@ -116,50 +121,53 @@ function EditCompanyProfile() {
   return (
     <>
       <Header />
-      <div className="account-page">
-        <div className="account-container">
+      <div className="account-page company-edit">
+        <div className="account-container company-edit-card">
           <h2>Editar Perfil de Empresa</h2>
-          <form className="account-form" onSubmit={handleSubmit}>
-            <div className="profile-picture-wrapper" style={{ marginBottom: 16 }}>
+          <form className="account-form company-form" onSubmit={handleSubmit}>
+            <div className="company-avatar">
               <img
                 src={logoPreview}
                 alt="Logo de la empresa"
                 className="profile-picture"
                 onError={e => { e.target.onerror = null; e.target.src = DEFAULT_LOGO; }}
-                style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: '50%' }}
               />
               <input
                 type="file"
                 accept="image/*"
-                style={{ display: 'none' }}
+                className="hidden-file-input"
                 ref={fileInputRef}
                 onChange={handleLogoChange}
               />
-              <button type="button" className="btn-secondary" onClick={() => fileInputRef.current.click()} style={{ marginTop: 8 }}>
+              <button type="button" className="edit-pic-btn" onClick={() => fileInputRef.current.click()}>
                 Cambiar Logo
               </button>
             </div>
-            <div className="form-group">
-              <label>Nombre de la cuenta</label>
-              <input type="text" name="name" value={form.name} onChange={handleChange} />
+
+            <div className="company-grid">
+              <div className="form-group">
+                <label>Nombre de la cuenta</label>
+                <input type="text" name="name" value={form.name} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Nombre de la empresa</label>
+                <input type="text" name="company_name" value={form.company_name} onChange={handleChange} />
+              </div>
+              <div className="form-group wide">
+                <label>Descripción</label>
+                <textarea name="description" value={form.description} onChange={handleChange} rows={4} />
+              </div>
+              <div className="form-group">
+                <label>Sitio web</label>
+                <input type="url" name="website" value={form.website} onChange={handleChange} placeholder="https://tusitio.com" />
+              </div>
             </div>
-            <div className="form-group">
-              <label>Nombre de la empresa</label>
-              <input type="text" name="company_name" value={form.company_name} onChange={handleChange} />
-            </div>
-            <div className="form-group">
-              <label>Descripción</label>
-              <textarea name="description" value={form.description} onChange={handleChange} rows={4} />
-            </div>
-            <div className="form-group">
-              <label>Sitio web</label>
-              <input type="url" name="website" value={form.website} onChange={handleChange} />
-            </div>
+
             {error && <p className="error-message">{error}</p>}
             {success && <p className="success-message">{success}</p>}
-            <div className="form-actions">
+            <div className="account-actions company-actions">
+              <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>Cancelar</button>
               <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Guardando...' : 'Guardar Cambios'}</button>
-              <button type="button" className="btn-secondary" onClick={() => navigate(-1)} style={{ marginLeft: 12 }}>Cancelar</button>
             </div>
           </form>
         </div>

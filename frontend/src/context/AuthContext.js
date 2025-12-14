@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const AuthContext = createContext();
 const NotificationContext = createContext();
@@ -20,21 +21,109 @@ export const useNotification = () => {
 };
 
 export const NotificationProvider = ({ children }) => {
+  const { token, user } = useAuth();
   const [notifications, setNotifications] = useState([]);
-  const addNotification = (message) => {
-    setNotifications(prev => [
-      { id: Date.now(), message, read: false, date: new Date() },
-      ...prev
-    ]);
+  const [notifAnim, setNotifAnim] = useState(false);
+  const prevNotifCount = useRef(0);
+
+  const fetchNotifications = async () => {
+    if (!token) {
+      setNotifications([]);
+      return;
+    }
+    try {
+      const res = await fetch(API_ENDPOINTS.NOTIFICATIONS, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      } else {
+        setNotifications([]);
+      }
+    } catch (e) {
+      setNotifications([]);
+    }
   };
-  const deleteNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [token, user]);
+
+  useEffect(() => {
+    const unreadCount = notifications.filter(n => !n.read).length;
+    if (unreadCount > prevNotifCount.current) {
+      setNotifAnim(true);
+      setTimeout(() => setNotifAnim(false), 1200);
+    }
+    prevNotifCount.current = unreadCount;
+  }, [notifications]);
+
+  const addNotification = async (message, type = null) => {
+    if (!token) return;
+    try {
+      const res = await fetch(API_ENDPOINTS.NOTIFICATIONS, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, type })
+      });
+      if (res.ok) {
+        const notif = await res.json();
+        setNotifications(prev => [notif, ...prev]);
+        setNotifAnim(true);
+        setTimeout(() => setNotifAnim(false), 1200);
+      }
+    } catch (e) {}
   };
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+
+  const deleteNotification = async (id) => {
+    if (!token) return;
+    try {
+      const res = await fetch(API_ENDPOINTS.NOTIFICATION_DELETE(id), {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+      }
+    } catch (e) {}
   };
+
+  const markAllAsRead = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(API_ENDPOINTS.NOTIFICATION_MARK_ALL_READ, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      }
+    } catch (e) {}
+  };
+
+  const markAsRead = async (id) => {
+    if (!token) return;
+    try {
+      const res = await fetch(API_ENDPOINTS.NOTIFICATION_MARK_READ(id), {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (!token) setNotifications([]);
+  }, [token]);
+
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification, deleteNotification, markAllAsRead }}>
+    <NotificationContext.Provider value={{ notifications, addNotification, deleteNotification, markAllAsRead, markAsRead, notifAnim, fetchNotifications }}>
       {children}
     </NotificationContext.Provider>
   );
@@ -46,7 +135,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar si hay un token guardado al cargar la app
     const savedToken = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     
@@ -72,6 +160,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  const updateUser = (nextUser) => {
+    if (!nextUser) return;
+    setUser(nextUser);
+    try {
+      localStorage.setItem('user', JSON.stringify(nextUser));
+    } catch (_) {}
+  };
+
   const isAuthenticated = () => {
     return !!token && !!user;
   };
@@ -82,6 +178,7 @@ export const AuthProvider = ({ children }) => {
     token,
     login,
     logout,
+    updateUser,
     isAuthenticated,
     loading
   };

@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Header from './Header';
 import './Pricing.css';
-
+import { useNavigate } from 'react-router-dom';
 function Pricing() {
-  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();  
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [userType, setUserType] = useState('user'); // 'user' or 'company'
-  const [loading, setLoading] = useState(false);
+  const [userType, setUserType] = useState(user?.role || 'user');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
   const companyPlans = [
     {
       id: 'company-basic',
-      name: 'Plan Básico',
+      name: 'Plan básico',
       price: 'Gratis',
       period: 'Siempre',
       features: [
@@ -24,26 +24,23 @@ function Pricing() {
         'Panel de administración básico'
       ],
       limitations: [
-        'Sin ofertas destacadas',
-        'Sin acceso a filtros avanzados',
-        'Sin reportes detallados'
+        'Sin ofertas destacadas (próximamente)',
+        'Sin filtros avanzados (próximamente)',
+        'Sin reportes detallados (próximamente)'
       ],
       popular: false
     },
     {
       id: 'company-pro',
-      name: 'Plan Profesional',
-      price: '$2.99',
-      period: 'por mes',
+      name: 'Plan profesional',
+      price: 'Próximamente',
+      period: '',
       features: [
         'Ofertas ilimitadas',
-        'Ofertas destacadas (5 por mes)',
+        'Ofertas destacadas',
         'Filtros avanzados de candidatos',
         'Reportes detallados',
-        'Soporte prioritario',
-        'Panel de administración avanzado',
-        'Análisis de candidatos',
-        'Notificaciones en tiempo real'
+        'Soporte prioritario'
       ],
       limitations: [],
       popular: true
@@ -53,7 +50,7 @@ function Pricing() {
   const userPlans = [
     {
       id: 'user-basic',
-      name: 'Plan Básico',
+      name: 'Plan básico',
       price: 'Gratis',
       period: 'Siempre',
       features: [
@@ -63,26 +60,23 @@ function Pricing() {
         'Notificaciones básicas'
       ],
       limitations: [
-        'Sin acceso a ofertas premium',
-        'Sin filtros avanzados',
-        'Sin reportes de aplicación'
+        'Sin acceso a ofertas avanzadas (próximamente)',
+        'Sin filtros avanzados (próximamente)',
+        'Sin reportes de aplicación (próximamente)'
       ],
       popular: false
     },
     {
       id: 'user-pro',
-      name: 'Plan Profesional',
-      price: '$2.99',
-      period: 'por mes',
+      name: 'Plan profesional',
+      price: 'Próximamente',
+      period: '',
       features: [
         'Postulaciones ilimitadas',
-        'Acceso a ofertas premium',
+        'Acceso a funcionalidades avanzadas',
         'Filtros avanzados de búsqueda',
         'Reportes de aplicación',
-        'Perfil destacado',
-        'Notificaciones prioritarias',
-        'Mensajería directa con empresas',
-        'Currículum personalizado'
+        'Perfil destacado'
       ],
       limitations: [],
       popular: true
@@ -90,10 +84,12 @@ function Pricing() {
   ];
 
   const handleUserTypeChange = (type) => {
-    setUserType(type);
-    setSelectedPlan(null);
-    setSuccess('');
-    setError('');
+    if (!isAuthenticated()) {
+      setUserType(type);
+      setSelectedPlan(null);
+      setSuccess('');
+      setError('');
+    }
   };
 
   const handlePlanSelect = (planId) => {
@@ -102,83 +98,63 @@ function Pricing() {
     setError('');
   };
 
-  const handleSubscribe = async () => {
+  const handleContinue = () => {
     if (!selectedPlan) {
       setError('Por favor selecciona un plan');
       return;
     }
 
-    if (!isAuthenticated()) {
-      setError('Debes iniciar sesión para suscribirte');
+    const isPro = selectedPlan.includes('-pro');
+    if (isPro) {
+      navigate('/checkout', { state: { plan: selectedPlan } });
       return;
     }
 
-    // Verificar que el plan seleccionado corresponda al tipo de cuenta del usuario
-    const userRole = user?.role;
-    const isCompanyPlan = selectedPlan.startsWith('company-');
-    const isUserPlan = selectedPlan.startsWith('user-');
-    
-    if (userRole === 'company' && !isCompanyPlan) {
-      setError('⚠️ Solo puedes suscribirte a planes de empresa con tu cuenta de empresa.');
-      return;
-    }
-    
-    if (userRole === 'user' && !isUserPlan) {
-      setError('⚠️ Solo puedes suscribirte a planes de usuario con tu cuenta de usuario.');
-      return;
-    }
-
-    // Verificar si es un plan de pago
-    const selectedPlanData = plans.find(p => p.id === selectedPlan);
-    if (selectedPlanData && selectedPlanData.price !== 'Gratis') {
-      setError('⚠️ Esta función aún no está preparada. Estamos trabajando para implementar el sistema de pagos próximamente.');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    // Simular proceso de pago solo para planes gratuitos
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess('¡Plan activado exitosamente!');
-      setSelectedPlan(null);
-      
-      setTimeout(() => {
-        setSuccess('');
-      }, 5000);
-    }, 2000);
+    setSuccess('El Plan gratuito ya está activo. No hay que hacer nada.');
+    setTimeout(() => setSuccess(''), 3500);
   };
 
-  const plans = userType === 'company' ? companyPlans : userPlans;
+  let effectiveUserType = user?.role || userType;
+  const plans = effectiveUserType === 'company' ? companyPlans : userPlans;
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   return (
     <div className="pricing-page">
       <Header />
       <div className="pricing-container">
         <div className="pricing-hero">
-          <h1>Planes y Precios</h1>
+          <h1>Planes y precios</h1>
           <p className="hero-subtitle">
-            Elige el plan perfecto para tu {userType === 'company' ? 'empresa' : 'carrera profesional'}
+            Elige el plan perfecto para tu {effectiveUserType === 'company' ? 'empresa' : 'carrera profesional'}
           </p>
         </div>
 
         <div className="pricing-content">
-          {/* Toggle para cambiar entre planes */}
-          <div className="plan-toggle">
-            <div 
-              className={`toggle-option ${userType === 'user' ? 'active' : ''}`}
-              onClick={() => handleUserTypeChange('user')}
-            >
-              <span>👤 Planes para Usuarios</span>
+          {!isAuthenticated() && (
+            <div className="plan-toggle">
+              <div 
+                className={`toggle-option ${userType === 'user' ? 'active' : ''}`}
+                onClick={() => handleUserTypeChange('user')}
+              >
+                <span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '8px', color: '#007AFF' }}>person</span>
+                  Planes para Usuarios
+                </span>
+              </div>
+              <div 
+                className={`toggle-option ${userType === 'company' ? 'active' : ''}`}
+                onClick={() => handleUserTypeChange('company')}
+              >
+                <span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '8px', color: '#007AFF' }}>business</span>
+                  Planes para Empresas
+                </span>
+              </div>
             </div>
-            <div 
-              className={`toggle-option ${userType === 'company' ? 'active' : ''}`}
-              onClick={() => handleUserTypeChange('company')}
-            >
-              <span>🏢 Planes para Empresas</span>
-            </div>
-          </div>
+          )}
 
           {success && (
             <div className="success-message">
@@ -253,20 +229,19 @@ function Pricing() {
             ))}
           </div>
 
-          {/* Botón de Suscripción */}
+          {/* Botón de Suscripción y formulario de pago */}
           {selectedPlan && (
             <div className="subscription-section">
               <div className="selected-plan-info">
-                <h3>Plan Seleccionado: {plans.find(p => p.id === selectedPlan)?.name}</h3>
+                <h3>Plan seleccionado: {plans.find(p => p.id === selectedPlan)?.name}</h3>
                 <p>Precio: {plans.find(p => p.id === selectedPlan)?.price} {plans.find(p => p.id === selectedPlan)?.period}</p>
               </div>
-              
-              <button 
+
+              <button
                 className="subscribe-btn"
-                onClick={handleSubscribe}
-                disabled={loading}
+                onClick={handleContinue}
               >
-                {loading ? 'Procesando...' : 'Suscribirse Ahora'}
+                {selectedPlan.includes('-pro') ? 'Ver Plan Profesional' : 'Continuar con Plan Gratuito'}
               </button>
             </div>
           )}
@@ -275,63 +250,61 @@ function Pricing() {
           <div className="pricing-info">
             <div className="info-grid">
               <div className="info-item">
-                <div className="info-icon">🔒</div>
-                <h4>Pago Seguro</h4>
-                <p>Todos los pagos están protegidos con encriptación SSL de 256 bits</p>
+                <div className="info-icon">
+                  <span className="material-symbols-outlined" style={{ color: '#007AFF', fontSize: '32px' }}>verified</span>
+                </div>
+                <h4>Plan gratuito</h4>
+                <p>El proyecto funciona con un único plan gratuito.</p>
               </div>
               
               <div className="info-item">
-                <div className="info-icon">🔄</div>
-                <h4>Cancelación Gratuita</h4>
-                <p>Puedes cancelar tu suscripción en cualquier momento sin penalización</p>
+                <div className="info-icon">
+                  <span className="material-symbols-outlined" style={{ color: '#007AFF', fontSize: '32px' }}>hourglass_top</span>
+                </div>
+                <h4>Plan profesional</h4>
+                <p>Todavía no está disponible. Se mostrará aquí cuando esté listo.</p>
               </div>
               
               <div className="info-item">
-                <div className="info-icon">💳</div>
-                <h4>Múltiples Métodos</h4>
-                <p>Aceptamos tarjetas de crédito, débito y transferencias bancarias</p>
+                <div className="info-icon">
+                  <span className="material-symbols-outlined" style={{ color: '#007AFF', fontSize: '32px' }}>support_agent</span>
+                </div>
+                <h4>Soporte</h4>
+                <p>Si necesitás ayuda, contactanos desde la sección de Contacto.</p>
               </div>
               
               <div className="info-item">
-                <div className="info-icon">📞</div>
-                <h4>Soporte 24/7</h4>
-                <p>Nuestro equipo está disponible para ayudarte en cualquier momento</p>
+                <div className="info-icon">
+                  <span className="material-symbols-outlined" style={{ color: '#007AFF', fontSize: '32px' }}>support_agent</span>
+                </div>
+                <h4>Transparencia</h4>
+                <p>No se realiza ningún pago ni cobro desde la plataforma.</p>
               </div>
             </div>
           </div>
 
           {/* FAQ de Precios */}
           <div className="pricing-faq">
-            <h2>Preguntas Frecuentes sobre Precios</h2>
+            <h2>Preguntas frecuentes sobre precios</h2>
             <div className="faq-grid">
               <div className="faq-item">
-                <h4>¿Puedo cambiar de plan en cualquier momento?</h4>
-                <p>Sí, puedes actualizar o degradar tu plan en cualquier momento. Los cambios se aplicarán en el próximo ciclo de facturación.</p>
+                <h4>¿Hay más de un plan?</h4>
+                <p>No. Por ahora el proyecto ofrece únicamente el Plan gratuito.</p>
               </div>
               
               <div className="faq-item">
-                <h4>¿Hay un período de prueba gratuito?</h4>
-                <p>Sí, ofrecemos un período de prueba gratuito de 7 días para todos nuestros planes pagos.</p>
+                <h4>¿Cuándo estará disponible el Plan profesional?</h4>
+                <p>Todavía no está disponible. Se habilitará en una futura versión.</p>
               </div>
               
               <div className="faq-item">
-                <h4>¿Qué métodos de pago aceptan?</h4>
-                <p>Aceptamos todas las tarjetas de crédito y débito principales, PayPal y transferencias bancarias.</p>
+                <h4>¿Se realizan pagos dentro de la plataforma?</h4>
+                <p>No. No hay procesamiento de pagos ni cobros.</p>
               </div>
               
               <div className="faq-item">
-                <h4>¿Puedo cancelar mi suscripción?</h4>
-                <p>Sí, puedes cancelar tu suscripción en cualquier momento desde tu panel de control.</p>
-              </div>
-              
-              <div className="faq-item">
-                <h4>¿Los precios incluyen IVA?</h4>
-                <p>Sí, todos los precios mostrados incluyen el IVA correspondiente según la legislación española.</p>
-              </div>
-              
-              <div className="faq-item">
-                <h4>¿Ofrecen descuentos para empresas grandes?</h4>
-                <p>Sí, ofrecemos descuentos especiales para empresas con más de 50 empleados. Contáctanos para más información.</p>
+                <h4>¿Mi cuenta puede perder acceso por no pagar?</h4>
+                <p>No. Al ser un plan gratuito, no hay suscripciones ni vencimientos por pago.</p>
               </div>
             </div>
           </div>

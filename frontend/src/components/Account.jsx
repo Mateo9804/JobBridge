@@ -1,7 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import Header from './Header';
+import Toast from './Toast';
+import AuthImage from './AuthImage';
+import CVBuilder from './CVBuilder';
 import './Account.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,20 +15,40 @@ function Account() {
   const [cvFile, setCvFile] = useState(null);
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
+  const [isWorking, setIsWorking] = useState(false);
   const [previewPic, setPreviewPic] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [showCvBuilder, setShowCvBuilder] = useState(false);
   const fileInputRef = useRef();
   const cvInputRef = useRef();
 
-  // Variable para el nombre completo de la imagen de perfil
-  const profilePicUrl = previewPic
-    ? previewPic
-    : (user?.profile_picture
-        ? `http://localhost/jobbrige/backend/public/storage/${user.profile_picture}?t=${Date.now()}`
-        : '/imagenes/iconoUsuario.png');
 
-  // Cargar datos reales al montar
+  const getProfilePictureUrl = () => {
+    return `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}`;
+  };
+  
+  const profilePicUrl = useMemo(() => {
+    if (previewPic && previewPic.startsWith('data:')) {
+      return previewPic;
+    }
+    if (previewPic && !previewPic.startsWith('data:')) {
+      return previewPic;
+    }
+    if (user?.profile_picture) {
+      return getProfilePictureUrl();
+    }
+    return '/imagenes/iconoUsuario.png';
+  }, [previewPic, user?.profile_picture]);
+
+  useEffect(() => {
+    if (user?.profile_picture && !previewPic && !loading) {
+      setPreviewPic(getProfilePictureUrl());
+    }
+  }, [user?.profile_picture, loading]);
+
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
@@ -35,15 +58,23 @@ function Account() {
         });
         if (res.status === 401) {
           if (logout) logout();
-          alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-          navigate('/login');
+          setToastMessage('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+          setShowToast(true);
+          setTimeout(() => navigate('/login'), 2000);
           return;
         }
         if (res.ok) {
           const data = await res.json();
           setName(data.name || '');
           setDescription(data.description || '');
-          setPreviewPic(data.profile_picture ? `/storage/${data.profile_picture}` : null);
+          setIsWorking(data.is_working || false);
+          // Actualizar preview con endpoint de la API
+          if (data.profile_picture) {
+            const picUrl = getProfilePictureUrl();
+            setPreviewPic(picUrl);
+          } else {
+            setPreviewPic(null);
+          }
           setCvFile(data.cv ? { name: data.cv.split('/').pop() } : null);
           if (setUser) setUser(data);
           localStorage.setItem('user', JSON.stringify(data));
@@ -52,7 +83,6 @@ function Account() {
       setLoading(false);
     };
     fetchProfile();
-    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -61,6 +91,10 @@ function Account() {
       return;
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0];
@@ -83,6 +117,7 @@ function Account() {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
+    formData.append('is_working', isWorking);
     if (profilePic) formData.append('profile_picture', profilePic);
     if (cvFile && cvFile instanceof File) formData.append('cv', cvFile);
     try {
@@ -93,22 +128,40 @@ function Account() {
       });
       if (res.status === 401) {
         if (logout) logout();
-        alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-        navigate('/login');
+        setToastMessage('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+        setShowToast(true);
+        setTimeout(() => navigate('/login'), 2000);
         return;
       }
       if (res.ok) {
         const data = await res.json();
+        
+        setName(data.name || '');
+        setDescription(data.description || '');
+        setIsWorking(data.is_working || false);
+        
         if (setUser) setUser(data);
         localStorage.setItem('user', JSON.stringify(data));
-        setPreviewPic(data.profile_picture ? `/storage/${data.profile_picture}` : null);
+        
+        setProfilePic(null);
+        
+        if (data.profile_picture) {
+          const picUrl = getProfilePictureUrl();
+          setPreviewPic(picUrl);
+        } else {
+          setPreviewPic(null);
+        }
         setCvFile(data.cv ? { name: data.cv.split('/').pop() } : null);
-        alert('Perfil actualizado');
+        
+        setToastMessage('Perfil actualizado');
+        setShowToast(true);
       } else {
-        alert('Error al guardar');
+        setToastMessage('Error al guardar');
+        setShowToast(true);
       }
     } catch (e) {
-      alert('Error de red');
+      setToastMessage('Error de red');
+      setShowToast(true);
     }
     setSaving(false);
   };
@@ -123,10 +176,11 @@ function Account() {
         <form className="account-form" onSubmit={handleSave}>
           <div className="profile-pic-section">
             <div className="profile-pic-wrapper">
-              <img
+              <AuthImage
                 src={profilePicUrl}
                 alt="Foto de perfil"
                 className="profile-pic"
+                token={token}
               />
               <button type="button" onClick={() => fileInputRef.current.click()} className="edit-pic-btn">
                 Cambiar foto
@@ -156,18 +210,34 @@ function Account() {
               <span>{user?.email}</span>
             </div>
             <div className="account-info-row">
+              <label>Estado laboral:</label>
+              <select
+                value={isWorking ? 'working' : 'not_working'}
+                onChange={e => setIsWorking(e.target.value === 'working')}
+                className="description-textarea"
+                style={{ minHeight: 0, padding: '8px 14px' }}
+              >
+                <option value="not_working">No estoy trabajando</option>
+                <option value="working">Estoy trabajando</option>
+              </select>
+            </div>
+            <div className="account-info-row">
               <label>CV:</label>
-              <button type="button" onClick={() => cvInputRef.current.click()} className="upload-cv-btn">
-                {cvFile ? 'Cambiar CV' : 'Subir CV'}
-              </button>
-              <input
-                type="file"
-                accept="application/pdf"
-                style={{ display: 'none' }}
-                ref={cvInputRef}
-                onChange={handleCvChange}
-              />
-              {cvFile && <span className="cv-file-name">{cvFile.name}</span>}
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button type="button" onClick={() => setShowCvBuilder(true)} className="upload-cv-btn" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: '#fff', border: 'none' }}>
+                  Crear CV
+                </button>
+                <button type="button" onClick={() => cvInputRef.current.click()} className="upload-cv-btn">
+                  {cvFile ? 'Cambiar CV' : 'Subir CV'}
+                </button>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  style={{ display: 'none' }}
+                  ref={cvInputRef}
+                  onChange={handleCvChange}
+                />
+              </div>
             </div>
             <div className="account-info-row">
               <label>Descripción:</label>
@@ -183,6 +253,20 @@ function Account() {
           <button type="submit" className="save-account-btn" disabled={saving}>{saving ? 'Guardando...' : 'Guardar cambios'}</button>
         </form>
       </div>
+      <Toast 
+        message={toastMessage} 
+        isOpen={showToast} 
+        onClose={() => setShowToast(false)} 
+      />
+      {showCvBuilder && (
+        <CVBuilder
+          onClose={() => setShowCvBuilder(false)}
+          onSave={() => {
+            setToastMessage('CV creado exitosamente');
+            setShowToast(true);
+          }}
+        />
+      )}
     </>
   );
 }

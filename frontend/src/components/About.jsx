@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from './Header';
 import './About.css';
 
-function About() {
+const MaterialIcon = ({ name, color = '#007AFF', size = 24, className = '' }) => (
+  <span 
+    className={`material-symbols-outlined ${className}`}
+    style={{ color, fontSize: size, verticalAlign: 'middle' }}
+  >
+    {name}
+  </span>
+);
+
+function About(props) {
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   return (
     <div className="about-page">
       <Header />
@@ -24,20 +37,26 @@ function About() {
           </section>
 
           <section className="about-section">
-            <h2>Nuestra Misión</h2>
+            <h2>Nuestra misión</h2>
             <div className="mission-grid">
               <div className="mission-card">
-                <div className="mission-icon">🎯</div>
+                <div className="mission-icon">
+                  <MaterialIcon name="target" color="#007AFF" size={48} />
+                </div>
                 <h3>Conectar</h3>
                 <p>Facilitar la conexión entre empresas y profesionales del sector tecnológico</p>
               </div>
               <div className="mission-card">
-                <div className="mission-icon">💡</div>
+                <div className="mission-icon">
+                  <MaterialIcon name="lightbulb" color="#007AFF" size={48} />
+                </div>
                 <h3>Innovar</h3>
                 <p>Utilizar tecnología avanzada para mejorar el proceso de contratación</p>
               </div>
               <div className="mission-card">
-                <div className="mission-icon">🚀</div>
+                <div className="mission-icon">
+                  <MaterialIcon name="rocket_launch" color="#007AFF" size={48} />
+                </div>
                 <h3>Crecer</h3>
                 <p>Ayudar a las empresas y profesionales a alcanzar su máximo potencial</p>
               </div>
@@ -48,34 +67,52 @@ function About() {
             <h2>¿Por qué JobBridge?</h2>
             <div className="features-grid">
               <div className="feature-item">
-                <h4>🎨 Interfaz Intuitiva</h4>
+                <h4>
+                  <MaterialIcon name="palette" color="#007AFF" size={20} style={{ marginRight: '8px' }} />
+                  Interfaz intuitiva
+                </h4>
                 <p>Diseño moderno y fácil de usar que hace que publicar y buscar empleos sea sencillo</p>
               </div>
               <div className="feature-item">
-                <h4>🔍 Búsqueda Avanzada</h4>
+                <h4>
+                  <MaterialIcon name="search" color="#007AFF" size={20} style={{ marginRight: '8px' }} />
+                  Búsqueda avanzada
+                </h4>
                 <p>Filtros por categoría, experiencia, ubicación y tipo de trabajo</p>
               </div>
               <div className="feature-item">
-                <h4>💼 Gestión de Empresas</h4>
+                <h4>
+                  <MaterialIcon name="work" color="#007AFF" size={20} style={{ marginRight: '8px' }} />
+                  Gestión de Empresas
+                </h4>
                 <p>Panel completo para que las empresas gestionen sus ofertas de trabajo</p>
               </div>
               <div className="feature-item">
-                <h4>📱 Responsive</h4>
+                <h4>
+                  <MaterialIcon name="smartphone" color="#007AFF" size={20} style={{ marginRight: '8px' }} />
+                  Responsive
+                </h4>
                 <p>Funciona perfectamente en dispositivos móviles, tablets y computadoras</p>
               </div>
               <div className="feature-item">
-                <h4>⚡ Proceso Rápido</h4>
+                <h4>
+                  <MaterialIcon name="bolt" color="#007AFF" size={20} style={{ marginRight: '8px' }} />
+                  Proceso rápido
+                </h4>
                 <p>Crear ofertas de trabajo en minutos con nuestro sistema de formularios inteligente</p>
               </div>
               <div className="feature-item">
-                <h4>🔒 Seguro y Confiable</h4>
+                <h4>
+                  <MaterialIcon name="lock" color="#007AFF" size={20} style={{ marginRight: '8px' }} />
+                  Seguro y confiable
+                </h4>
                 <p>Plataforma segura con validaciones y protección de datos</p>
               </div>
             </div>
           </section>
 
           <section className="about-section">
-            <h2>Nuestros Valores</h2>
+            <h2>Nuestros valores</h2>
             <div className="values-grid">
               <div className="value-card">
                 <h4>Transparencia</h4>
@@ -93,76 +130,16 @@ function About() {
                 <h4>Colaboración</h4>
                 <p>Fomentamos la colaboración entre empresas y profesionales</p>
               </div>
-            </div>
-          </section>
-
-          <section className="about-section">
-            <h2>Tecnologías Utilizadas</h2>
-            <div className="tech-stack">
-              <div className="tech-category">
-                <h4>Frontend</h4>
-                <div className="tech-tags">
-                  <span className="tech-tag">React</span>
-                  <span className="tech-tag">JavaScript</span>
-                  <span className="tech-tag">CSS3</span>
-                  <span className="tech-tag">HTML5</span>
-                </div>
+              <div className="value-card">
+                <h4>Confianza</h4>
+                <p>Protegemos tus datos y aseguramos relaciones basadas en la fiabilidad</p>
               </div>
-              <div className="tech-category">
-                <h4>Backend</h4>
-                <div className="tech-tags">
-                  <span className="tech-tag">Laravel</span>
-                  <span className="tech-tag">PHP</span>
-                  <span className="tech-tag">MySQL</span>
-                  <span className="tech-tag">REST API</span>
-                </div>
-              </div>
-              <div className="tech-category">
-                <h4>Herramientas</h4>
-                <div className="tech-tags">
-                  <span className="tech-tag">Git</span>
-                  <span className="tech-tag">XAMPP</span>
-                  <span className="tech-tag">npm</span>
-                  <span className="tech-tag">Composer</span>
-                </div>
+              <div className="value-card">
+                <h4>Sostenibilidad</h4>
+                <p>Impulsamos un crecimiento responsable con impacto positivo en la comunidad</p>
               </div>
             </div>
           </section>
-
-          <section className="about-section">
-            <h2>Plan de Desarrollo</h2>
-            <div className="roadmap">
-              <div className="roadmap-item completed">
-                <div className="roadmap-marker">✓</div>
-                <div className="roadmap-content">
-                  <h4>Fase 1: MVP</h4>
-                  <p>Plataforma básica con registro, login, creación y visualización de ofertas</p>
-                </div>
-              </div>
-              <div className="roadmap-item current">
-                <div className="roadmap-marker">🔄</div>
-                <div className="roadmap-content">
-                  <h4>Fase 2: Mejoras UX</h4>
-                  <p>Sistema de tags, desplegables, modales personalizados y optimizaciones</p>
-                </div>
-              </div>
-              <div className="roadmap-item">
-                <div className="roadmap-marker">⏳</div>
-                <div className="roadmap-content">
-                  <h4>Fase 3: Funcionalidades Avanzadas</h4>
-                  <p>Sistema de aplicaciones, notificaciones, filtros avanzados y analytics</p>
-                </div>
-              </div>
-              <div className="roadmap-item">
-                <div className="roadmap-marker">⏳</div>
-                <div className="roadmap-content">
-                  <h4>Fase 4: Plan Premium</h4>
-                  <p>Implementación del sistema de pagos y funcionalidades premium</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
           <section className="about-section">
             <h2>Contacto</h2>
             <div className="contact-info">
@@ -172,16 +149,22 @@ function About() {
               </p>
               <div className="contact-details">
                 <div className="contact-item">
-                  <span className="contact-icon">📧</span>
+                  <span className="contact-icon">
+                    <MaterialIcon name="email" color="#007AFF" size={24} />
+                  </span>
                   <span>info@jobbridge.com</span>
                 </div>
                 <div className="contact-item">
-                  <span className="contact-icon">🌐</span>
+                  <span className="contact-icon">
+                    <MaterialIcon name="language" color="#007AFF" size={24} />
+                  </span>
                   <span>www.jobbridge.com</span>
                 </div>
                 <div className="contact-item">
-                  <span className="contact-icon">📍</span>
-                  <span>Madrid, España</span>
+                  <span className="contact-icon">
+                    <MaterialIcon name="location_on" color="#007AFF" size={24} />
+                  </span>
+                  <span>Alicante, Monóvar</span>
                 </div>
               </div>
             </div>

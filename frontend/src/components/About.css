@@ -38,7 +38,7 @@
 
 .about-section {
   background: #000;
-  max-width: 900px;
+  max-width: 1100px;
   margin: 3rem auto;
   border-radius: 24px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.12);
@@ -63,7 +63,7 @@
   font-size: 1.1rem;
   line-height: 1.7;
   text-align: center;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -92,6 +92,9 @@
 .mission-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mission-card h3 {
@@ -134,6 +137,8 @@
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .feature-item p {
@@ -309,6 +314,10 @@
   color: #fff;
   box-shadow: 0 6px 24px rgba(0,122,255,0.18);
 }
+
+.contact-item:hover .contact-icon .material-symbols-outlined {
+  color: #fff !important;
+}
 .contact-item.bg-blue {
   background: #007aff;
   color: #fff;
@@ -321,12 +330,23 @@
   background: #339dff;
   color: #fff;
 }
+
+.contact-item.bg-blue:hover .contact-icon .material-symbols-outlined {
+  color: #fff !important;
+}
 .contact-item.bg-black:hover {
   background: #222;
   color: #fff;
 }
+
+.contact-item.bg-black:hover .contact-icon .material-symbols-outlined {
+  color: #fff !important;
+}
 .contact-item .contact-icon {
   font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .contact-item span,
 .contact-item a {
@@ -376,5 +396,131 @@
   .features-grid, .values-grid, .mission-grid, .tech-stack {
     grid-template-columns: 1fr;
     gap: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-container {
+    padding: 1rem;
+  }
+
+  .about-hero {
+    padding: 2rem 0 1rem 0;
+  }
+
+  .about-hero h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0 0.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+    padding: 0 1rem;
+  }
+
+  .about-section {
+    padding: 1.5rem 1rem;
+    margin: 1.5rem auto;
+    border-radius: 16px;
+    max-width: 100%;
+  }
+
+  .about-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .about-section p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 0 0.5rem;
+  }
+
+  .mission-grid,
+  .features-grid,
+  .values-grid,
+  .tech-stack {
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .mission-card,
+  .feature-item,
+  .value-card {
+    padding: 1.25rem;
+  }
+
+  .mission-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mission-card h3,
+  .value-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mission-card p,
+  .feature-item p,
+  .value-card p {
+    font-size: 0.9rem;
+  }
+
+  .feature-item h4 {
+    font-size: 1.1rem;
+  }
+
+  .tech-category h4 {
+    font-size: 1.1rem;
+  }
+
+  .tech-tag {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .roadmap {
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .roadmap-item {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .roadmap-marker {
+    font-size: 1.5rem;
+  }
+
+  .roadmap-content h4 {
+    font-size: 1rem;
+  }
+
+  .roadmap-content p {
+    font-size: 0.9rem;
+  }
+
+  .contact-info {
+    padding: 1.5rem 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .contact-details {
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .contact-item {
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+    min-height: 48px;
+  }
+
+  .contact-item .contact-icon {
+    font-size: 1.25rem;
   }
 } 

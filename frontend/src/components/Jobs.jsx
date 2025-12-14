@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
-import AuthModal from './AuthModal';
 import { useAuth, useNotification } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import './Jobs.css';
@@ -10,8 +9,11 @@ function Jobs() {
   const [selectedCategory, setSelectedCategory] = useState('todos');
   const [selectedExperience, setSelectedExperience] = useState('todos');
   const [selectedLocation, setSelectedLocation] = useState('todos');
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const [appliedJobs, setAppliedJobs] = useState([]);
+  const [applicationLimitReached, setApplicationLimitReached] = useState(false);
+  const [jobsWithMaxApplications, setJobsWithMaxApplications] = useState([]);
   
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -20,7 +22,6 @@ function Jobs() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        // Construir la query string con los filtros
         const params = [];
         if (selectedCategory !== 'todos') params.push(`category=${encodeURIComponent(selectedCategory)}`);
         if (selectedExperience !== 'todos') params.push(`experience=${encodeURIComponent(selectedExperience)}`);
@@ -39,13 +40,64 @@ function Jobs() {
     fetchJobs();
   }, [selectedCategory, selectedExperience, selectedLocation]);
 
-  // Ya no es necesario filtrar en frontend, solo mostrar jobs
+  useEffect(() => {
+    const fetchAppliedJobs = async () => {
+      const token = localStorage.getItem('token');
+      if (!token || !user) return;
+      try {
+        const response = await fetch(`${API_ENDPOINTS.USER_APPLICATIONS}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            setAppliedJobs(data.map(app => app.job_id));
+            if (data.length >= 2) {
+              setApplicationLimitReached(true);
+            } else {
+              setApplicationLimitReached(false);
+            }
+          }
+        }
+      } catch (e) {}
+    };
+    fetchAppliedJobs();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchJobsWithMaxApplications = async () => {
+      try {
+        const response = await fetch(`${API_ENDPOINTS.JOBS}`);
+        if (response.ok) {
+          const jobsData = await response.json();
+          const jobsWithMax = [];
+          for (const job of jobsData) {
+            if (job.applications_count >= 5) {
+              jobsWithMax.push(job.id);
+            }
+          }
+          setJobsWithMaxApplications(jobsWithMax);
+        }
+      } catch (e) {}
+    };
+    fetchJobsWithMaxApplications();
+  }, [jobs]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   const filteredJobs = jobs;
 
   const handleApply = (job) => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-    } else if (user?.role === 'user') {
+    const token = localStorage.getItem('token');
+    
+    if (!token || !isAuthenticated || !user) {
+      setShowLoginModal(true);
+      return;
+    }
+    
+    if (user.role === 'user') {
       navigate('/apply', { state: { job } });
     }
   };
@@ -56,7 +108,7 @@ function Jobs() {
       
       <div className="jobs-container">
         <div className="jobs-header">
-          <h1>Ofertas de Trabajo para Programadores en España</h1>
+          <h1>Ofertas de trabajo para programadores en España</h1>
           <p>Encuentra tu próximo trabajo en tecnología</p>
         </div>
 
@@ -162,11 +214,12 @@ function Jobs() {
                       Solo para Usuarios
                     </button>
                   ) : (
-                    <button 
-                      className="apply-btn"
+                    <button
+                      className={`apply-btn${appliedJobs.includes(job.id) || applicationLimitReached || jobsWithMaxApplications.includes(job.id) ? ' disabled' : ''}`}
                       onClick={() => handleApply(job)}
+                      disabled={appliedJobs.includes(job.id) || applicationLimitReached || jobsWithMaxApplications.includes(job.id)}
                     >
-                      Aplicar Ahora
+                      {appliedJobs.includes(job.id) ? 'Ya te inscribiste' : 'Inscribirte Ahora'}
                     </button>
                   )}
                 </div>
@@ -176,11 +229,44 @@ function Jobs() {
         </div>
       </div>
 
-      {/* Modal de autenticación */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-      />
+      {/* Modal de Login */}
+      {showLoginModal && (
+        <div className="modal-overlay" onClick={() => setShowLoginModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Acceso requerido</h2>
+              <button className="modal-close" onClick={() => setShowLoginModal(false)}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-message">
+                Debes iniciar sesión o registrarte para postularte a un trabajo.
+              </p>
+              <p className="modal-description">
+                Únete a JobBridge para postularte a trabajos de programación en España.
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="modal-btn-cancel" 
+                onClick={() => setShowLoginModal(false)}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="modal-btn-confirm" 
+                onClick={() => {
+                  setShowLoginModal(false);
+                  navigate('/login');
+                }}
+              >
+                Ir a iniciar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

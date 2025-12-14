@@ -1,0 +1,306 @@
+.course-view-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  margin-top: 80px;
+}
+
+.course-hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.course-hero h1 {
+  font-size: 2.5rem;
+  color: #1a202c;
+  margin-bottom: 15px;
+}
+
+.course-hero p {
+  font-size: 1.2rem;
+  color: #4a5568;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.course-message {
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 8px;
+  text-align: center;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.course-gate {
+  text-align: center;
+  padding: 40px;
+  background: #f7fafc;
+  border-radius: 12px;
+  margin: 30px 0;
+}
+
+.course-gate p {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 20px;
+}
+
+.course-gate .actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.course-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.course-progress {
+  margin-bottom: 30px;
+}
+
+.cpp-content {
+  margin-top: 30px;
+}
+
+.cpp-content h2 {
+  color: #1a202c;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+}
+
+.lesson-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.lesson-list li {
+  padding: 15px;
+  margin-bottom: 10px;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.module {
+  margin: 30px 0;
+  padding: 25px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #2f80ed;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.module:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.module h3 {
+  color: #1a202c;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+.module h3 a {
+  color: #2f80ed;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.module h3 a:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.module ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.module ul li {
+  padding: 10px 0;
+  margin-left: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.module ul li:last-child {
+  border-bottom: none;
+}
+
+.module ul li a {
+  color: #4a5568;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s, transform 0.2s;
+  font-size: 1rem;
+}
+
+.module ul li a:hover {
+  color: #2f80ed;
+  transform: translateX(5px);
+}
+
+.module ul li a::before {
+  content: "→";
+  margin-right: 10px;
+  color: #2f80ed;
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.module ul li a:hover::before {
+  opacity: 1;
+}
+
+.placeholder-content {
+  text-align: center;
+  padding: 40px;
+}
+
+.placeholder-content h2 {
+  color: #1a202c;
+  margin-bottom: 15px;
+}
+
+.placeholder-content p {
+  color: #4a5568;
+  margin-bottom: 20px;
+}
+
+.placeholder-content ul {
+  text-align: left;
+  max-width: 600px;
+  margin: 20px auto;
+  list-style-position: inside;
+}
+
+.cta {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.cta button {
+  padding: 12px 30px;
+  background: #2f80ed;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cta button:hover {
+  background: #2563eb;
+}
+
+@media (max-width: 768px) {
+  .course-view-page {
+    padding: 20px 15px;
+    margin-top: 70px;
+  }
+
+  .course-hero {
+    margin-bottom: 30px;
+  }
+
+  .course-hero h1 {
+    font-size: 2rem;
+    padding: 0 0.5rem;
+  }
+
+  .course-hero p {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .course-content {
+    padding: 20px;
+  }
+
+  .module {
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .module h3 {
+    font-size: 1.2rem;
+  }
+
+  .course-gate {
+    padding: 30px 20px;
+  }
+
+  .course-gate .actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .course-gate .actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .course-view-page {
+    padding: 16px 12px;
+    margin-top: 60px;
+  }
+
+  .course-hero h1 {
+    font-size: 1.75rem;
+    margin-bottom: 12px;
+  }
+
+  .course-hero p {
+    font-size: 0.95rem;
+  }
+
+  .course-content {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .module {
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .module h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  .module ul li {
+    margin-left: 10px;
+    padding: 8px 0;
+  }
+
+  .course-gate {
+    padding: 24px 16px;
+  }
+
+  .course-gate p {
+    font-size: 1rem;
+  }
+
+  .cpp-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .lesson-list li {
+    padding: 12px;
+  }
+}
+

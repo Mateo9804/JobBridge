@@ -1,16 +1,17 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\CourseController;
 
 Route::get('/test', function () {
     return response()->json(['message' => 'API funcionando correctamente']);
 });
-
 Route::get('/cors-test', function () {
     return response()->json([
         'message' => 'CORS test successful',
@@ -21,7 +22,7 @@ Route::get('/cors-test', function () {
 
 Route::get('/test-db', function () {
     try {
-        \DB::connection()->getPdo();
+        DB::connection()->getPdo();
         return response()->json(['message' => 'Database connection successful']);
     } catch (\Exception $e) {
         return response()->json(['error' => 'Database connection failed: ' . $e->getMessage()], 500);
@@ -63,19 +64,21 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Rutas para trabajos
 Route::get('/jobs', [JobController::class, 'index']);
-Route::get('/company/jobs', [JobController::class, 'companyJobs']);
-Route::post('/jobs', [JobController::class, 'store']);
+Route::middleware('auth:sanctum')->get('/company/jobs', [JobController::class, 'companyJobs']);
+Route::middleware('auth:sanctum')->post('/jobs', [JobController::class, 'store']);
 Route::get('/jobs/{job}', [JobController::class, 'show']);
 Route::put('/jobs/{job}', [JobController::class, 'update']);
 Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
-
-// Rutas para aplicaciones
-Route::post('/applications', [ApplicationController::class, 'store']);
 
 // Rutas protegidas para perfil de usuario
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'getProfile']);
     Route::post('/profile', [AuthController::class, 'updateProfile']);
+    Route::get('/profile/cv', [AuthController::class, 'downloadCv']);
+    Route::get('/profile/picture', [AuthController::class, 'getProfilePicture']);
+    Route::get('/profile/cv-data', [AuthController::class, 'getCvData']);
+    Route::post('/profile/cv-data', [AuthController::class, 'saveCvData']);
+    Route::post('/profile/cv-data/generate-pdf', [AuthController::class, 'generateCvPdf']);
 
     // Notificaciones del usuario autenticado
     Route::get('/notifications', [NotificationController::class, 'index']);
@@ -83,7 +86,34 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+    // Postulaciones de un trabajo (solo empresa dueña)
+    Route::get('/jobs/{job}/applications', [\App\Http\Controllers\ApplicationController::class, 'jobApplications']);
+
+    // Crear postulación (protegido)
+    Route::post('/applications', [ApplicationController::class, 'store']);
+
+    // Postulaciones del usuario autenticado
+    Route::get('/user/applications', [ApplicationController::class, 'userApplications']);
+
+    // Eliminar postulación (solo empresa dueña del trabajo)
+    Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
+
+    // Obtener todas las postulaciones de los trabajos publicados por la empresa
+    Route::get('/company/applications', [ApplicationController::class, 'companyApplications']);
 });
 
 // Ruta pública para ver perfil de empresa
 Route::get('/company/{id}/profile', [AuthController::class, 'getCompanyProfile']);
+
+// Rutas para cursos
+Route::get('/courses', [CourseController::class, 'index']);
+Route::get('/courses/{course}', [CourseController::class, 'show']);
+
+// Rutas protegidas para cursos (solo usuarios)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/courses/{course}/enroll', [CourseController::class, 'enroll']);
+    Route::get('/user/courses', [CourseController::class, 'myCourses']);
+    Route::post('/enrollments/{enrollment}/complete-lesson', [CourseController::class, 'completeLesson']);
+    Route::get('/enrollments/{enrollment}/progress', [CourseController::class, 'getProgress']);
+});

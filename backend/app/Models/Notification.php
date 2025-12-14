@@ -17,4 +17,14 @@ class Notification extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public static function createForUser($userId, $type, $message)
+    {
+        return self::create([
+            'user_id' => $userId,
+            'type' => $type,
+            'message' => $message,
+            'read' => false,
+        ]);
+    }
 }

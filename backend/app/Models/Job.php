@@ -29,25 +29,16 @@ class Job extends Model
         'skills' => 'array',
     ];
 
-    /**
-     * Get the user that owns the job.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the salary range as a formatted string.
-     */
     public function getSalaryRangeAttribute()
     {
         return "€" . number_format($this->salary_min, 0, ',', '.') . " - €" . number_format($this->salary_max, 0, ',', '.');
     }
 
-    /**
-     * Get skills as array.
-     */
     public function getSkillsArrayAttribute()
     {
         if (is_array($this->skills)) {
@@ -63,5 +54,10 @@ class Job extends Model
         }
         
         return [];
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(\App\Models\Application::class);
     }
 } 

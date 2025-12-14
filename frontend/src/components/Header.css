@@ -89,8 +89,6 @@
 }
 
 .nav-menu a:hover, .nav-menu a:focus,
-.btn-login:hover, .btn-login:focus,
-.btn-register:hover, .btn-register:focus,
 .user-name:hover, .user-name:focus {
   background: #007AFF;
   color: #fff;
@@ -102,6 +100,16 @@
   gap: 16px;
   overflow: visible !important;
 }
+
+/* Estilos específicos para evitar interferencias */
+.auth-buttons .btn-register {
+  background: linear-gradient(135deg, #374151 0%, #111827 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 3px 12px rgba(55, 65, 81, 0.25) !important;
+}
+
+/* ESTA REGLA HA SIDO MOVIDA A SELECTORES MÁS ESPECÍFICOS ARRIBA */
 
 .user-menu {
   display: flex;
@@ -125,42 +133,103 @@
   overflow: visible !important;
 }
 
-.btn-login, .btn-register {
-  font-size: 18px;
+.btn-login {
+  font-size: 14px;
   font-weight: 600;
   border: none;
-  border-radius: 10px;
-  padding: 0 22px;
-  height: 40px;
+  border-radius: 8px;
+  padding: 0 24px;
+  height: 36px;
+  min-width: 120px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.3s ease;
   box-sizing: border-box;
   overflow: visible !important;
-}
-
-.btn-login {
-  background: #fff;
-  color: #222;
-  border: 1.5px solid #ececec;
-}
-
-.btn-login:hover, .btn-login:focus {
-  background: #f2f2f2;
-  color: #222;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  z-index: 1;
+  isolation: isolate;
 }
 
 .btn-register {
-  background: linear-gradient(90deg, #7f5fff 0%, #007AFF 100%);
-  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
   border: none;
-  box-shadow: 0 2px 8px rgba(127, 95, 255, 0.08);
+  border-radius: 8px;
+  padding: 0 24px;
+  height: 36px;
+  min-width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  overflow: visible !important;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  z-index: 1;
+  isolation: isolate;
 }
 
-.btn-register:hover, .btn-register:focus {
-  background: linear-gradient(90deg, #007AFF 0%, #7f5fff 100%);
-  color: #fff;
+.btn-login {
+  background: rgba(255, 255, 255, 0.95);
+  color: #222;
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.btn-login:hover:not(.btn-register),
+.btn-login:focus:not(.btn-register) {
+  background: rgba(0, 122, 255, 0.08) !important;
+  color: #007AFF !important;
+  border-color: #007AFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15) !important;
+}
+
+.btn-register {
+  background: linear-gradient(135deg, #374151 0%, #111827 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 3px 12px rgba(55, 65, 81, 0.25) !important;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  isolation: isolate;
+}
+
+.btn-register::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.btn-register:hover::before {
+  left: 100%;
+}
+
+.btn-register:hover:not(.btn-login),
+.btn-register:focus:not(.btn-login) {
+  background: linear-gradient(135deg, #000000 0%, #000000 100%) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .btn-logout {
@@ -180,7 +249,6 @@
   color: #fff;
 }
 
-/* Mobile Menu */
 .mobile-menu-toggle {
   display: none;
   flex-direction: column;
@@ -207,7 +275,6 @@
   display: block;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .header-container {
     padding: 0 10px;
@@ -237,7 +304,19 @@
   .nav-menu ul {
     gap: 8px;
   }
-  .nav-menu a, .btn-login, .btn-register, .btn-logout, .user-name {
+  .nav-menu a, .btn-logout, .user-name {
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+  
+  .btn-login {
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+  
+  .btn-register {
     font-size: 13px;
     padding: 4px 6px;
     border-radius: 6px;
@@ -246,22 +325,92 @@
 
 @media (max-width: 480px) {
   .header-container {
-    padding: 0 4px;
+    padding: 0 8px;
+    height: 56px;
+    gap: 8px;
+  }
+  
+  .logo {
+    font-size: 14px;
+  }
+  
+  .logo h1 {
+    font-size: 18px;
+    letter-spacing: 0.3px;
+  }
+  
+  .mobile-menu-toggle {
+    padding: 6px;
+    margin-left: 8px;
+  }
+  
+  .mobile-menu-toggle span {
+    width: 24px;
+    height: 2.5px;
+    margin: 3px 0;
+  }
+  
+  .mobile-menu {
+    width: 85vw;
+    max-width: 320px;
+    padding: 24px 20px;
+    gap: 24px;
+  }
+  
+  .mobile-nav-menu ul {
+    gap: 12px;
+  }
+  
+  .mobile-nav-menu a {
+    font-size: 1.05rem;
+    padding: 14px 24px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .mobile-auth-buttons {
+    gap: 12px;
+  }
+  
+  .mobile-auth-buttons .btn-login,
+  .mobile-auth-buttons .btn-register {
+    font-size: 0.95rem;
+    padding: 14px 18px;
     height: 48px;
   }
-  .logo h1 {
-    font-size: 16px;
+  
+  .user-dropdown-menu {
+    min-width: 180px;
+    padding: 6px;
   }
-  .auth-buttons {
-    gap: 6px;
+  
+  .user-dropdown-menu a,
+  .user-dropdown-menu button {
+    font-size: 0.95rem;
+    padding: 8px 0;
   }
-  .btn-login, .btn-register, .btn-logout, .user-name {
-    font-size: 11px;
-    padding: 6px 6px;
-    border-radius: 6px;
+  
+  .user-dropdown-menu a > span,
+  .user-dropdown-menu button > span {
+    padding: 10px 10px;
+    font-size: 0.95rem;
   }
-  .user-menu {
-    gap: 4px;
+  
+  .notif-dropdown-menu {
+    min-width: 280px;
+    max-width: 90vw;
+    right: -10px;
+  }
+  
+  .notif-item {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  .notif-delete-btn {
+    font-size: 1.1rem;
+    padding: 0 6px;
   }
 }
 
@@ -298,7 +447,7 @@
     color: #222 !important;
     background: none !important;
     border-radius: 12px !important;
-    padding: 10px 12px !important;
+    padding: 0 !important;
     transition: background 0.2s, color 0.2s;
     font-size: 1.1rem;
     font-weight: 500;
@@ -306,37 +455,53 @@
     width: 100%;
     text-align: left;
     margin-bottom: 8px;
+    cursor: pointer;
   }
-  .mobile-menu .user-dropdown-menu a:hover,
-  .mobile-menu .user-dropdown-menu button:hover {
-    background: #0d2233 !important;
+
+  .mobile-menu .user-dropdown-menu a > span,
+  .mobile-menu .user-dropdown-menu button > span {
+    display: block;
+    padding: 12px 16px !important;
+    border-radius: 12px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .mobile-menu .user-dropdown-menu a:hover > span,
+  .mobile-menu .user-dropdown-menu button:hover > span {
+    background: #007bff !important;
     color: #fff !important;
   }
-  .mobile-menu .user-dropdown-menu a {
-    background: none !important;
+
+  .mobile-menu .user-dropdown-menu button.btn-logout-dropdown:hover > span {
+    background: #e53935 !important;
+    color: #fff !important;
   }
   .mobile-menu .user-dropdown-trigger {
     color: #222 !important;
   }
   .user-dropdown-trigger:hover,
-  .user-menu-wrapper:focus-within .user-dropdown-trigger,
-  .user-menu-wrapper[aria-expanded="true"] .user-dropdown-trigger {
-    color: #222 !important;
+  .user-dropdown-trigger:focus {
     background: #0d2233 !important;
-    border-radius: 24px !important;
+    color: #fff !important;
+    border-radius: 14px !important;
+    text-decoration: underline !important;
+    text-decoration-color: #fff !important;
+    text-underline-offset: 4px !important;
   }
 }
 
-/* Focus States for Accessibility */
 .nav-menu a:focus,
 .btn-login:focus,
-.btn-register:focus,
 .btn-logout:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
 }
 
-/* Dark mode support */
+.btn-register:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.3) !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .header {
     background: rgba(0, 0, 0, 0.95);
@@ -423,41 +588,91 @@
   gap: 16px;
 }
 
-.mobile-auth-buttons .btn-login, .mobile-auth-buttons .btn-register {
+.mobile-auth-buttons .btn-login {
   width: 100%;
   justify-content: center;
-  font-size: 1.1rem;
-  padding: 12px 0;
-  border-radius: 8px;
+  font-size: 1rem;
+  padding: 14px 20px;
+  border-radius: 10px;
+  height: 44px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .mobile-auth-buttons .btn-register {
-  background: linear-gradient(90deg, #7f5fff 0%, #007AFF 100%);
-  color: #fff;
-  border: none;
+  width: 100%;
+  justify-content: center;
+  font-size: 1rem;
+  padding: 14px 20px;
+  border-radius: 10px;
+  height: 44px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.mobile-auth-buttons .btn-register {
+  background: linear-gradient(135deg, #374151 0%, #111827 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 3px 12px rgba(55, 65, 81, 0.25) !important;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  isolation: isolate;
+}
+
+.mobile-auth-buttons .btn-register::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.mobile-auth-buttons .btn-register:hover::before {
+  left: 100%;
 }
 
 .mobile-auth-buttons .btn-login {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.95);
   color: #222;
-  border: 1.5px solid #ececec;
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.mobile-auth-buttons .btn-login:hover {
-  background: #f2f2f2;
-  color: #222;
+/* MÓVIL - BOTÓN LOGIN HOVER INDEPENDIENTE */
+.mobile-auth-buttons .btn-login:hover:not(.btn-register) {
+  background: rgba(0, 122, 255, 0.08) !important;
+  color: #007AFF !important;
+  border-color: #007AFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15) !important;
 }
 
-.mobile-auth-buttons .btn-register:hover {
-  background: linear-gradient(90deg, #007AFF 0%, #7f5fff 100%);
-  color: #fff;
+/* MÓVIL - BOTÓN REGISTER HOVER INDEPENDIENTE */
+.mobile-auth-buttons .btn-register:hover:not(.btn-login) {
+  background: linear-gradient(135deg, #000000 0%, #000000 100%) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Menú desplegable de usuario */
-.user-menu-wrapper {
+.user-menu-wrapper, .notif-menu-wrapper {
   position: relative;
   display: inline-block;
   overflow: visible !important;
+  padding-bottom: 0 !important;
 }
 
 .user-dropdown-trigger {
@@ -476,34 +691,31 @@
 }
 
 .user-dropdown-trigger:hover,
-.user-menu-wrapper:focus-within .user-dropdown-trigger {
+.user-dropdown-trigger:focus {
   background: #0d2233 !important;
   color: #fff !important;
+  border-radius: 14px !important;
   text-decoration: underline !important;
   text-decoration-color: #fff !important;
   text-underline-offset: 4px !important;
-  border-radius: 14px !important;
-  overflow: visible !important;
 }
 
 .user-dropdown-menu {
-  display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0px);
   left: 0;
+  z-index: 9999;
   background: #fff;
   min-width: 210px;
   box-shadow: 0 4px 16px #0002;
   border-radius: 8px;
-  z-index: 9999;
-  margin-top: 0;
+  margin-top: 0 !important;
   padding: 8px 8px;
   overflow: visible !important;
 }
 
 .user-menu-wrapper:hover .user-dropdown-menu,
-.user-menu-wrapper:focus-within .user-dropdown-menu,
-.user-dropdown-menu:hover {
+.user-menu-wrapper:focus-within .user-dropdown-menu {
   display: block;
 }
 
@@ -548,6 +760,39 @@
   text-decoration: underline;
 }
 
+.btn-logout-dropdown {
+  background: none;
+  border: none;
+  color: #222 !important;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+}
+
+.btn-logout-dropdown:hover {
+  background: none !important;
+}
+
+.btn-logout-dropdown > span {
+  display: inline-block;
+  width: 100%;
+  background: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-logout-dropdown:hover > span {
+  background: #e53935 !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 /* Notificaciones */
 .notification-btn {
   position: relative;
@@ -585,24 +830,24 @@
 }
 
 .notif-dropdown-menu {
+  display: none;
   position: absolute;
-  top: 36px;
+  top: calc(100% + 8px);
   right: 0;
-  min-width: 260px;
+  left: auto;
   background: #fff;
-  border: 1px solid #e0e0e0;
+  min-width: 210px;
+  box-shadow: 0 4px 16px #0002;
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  z-index: 100;
-  padding: 8px 0 8px 0;
-  max-height: 320px;
-  overflow-y: auto;
-  animation: notif-fade-in 0.2s;
+  z-index: 10000;
+  margin-top: 0;
+  padding: 8px 8px;
+  overflow: visible !important;
 }
 
-@keyframes notif-fade-in {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.notif-menu-wrapper:hover .notif-dropdown-menu,
+.notif-menu-wrapper:focus-within .notif-dropdown-menu {
+  display: block;
 }
 
 .notif-item {

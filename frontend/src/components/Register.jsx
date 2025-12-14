@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import { API_ENDPOINTS } from '../config/api';
@@ -16,9 +16,12 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    // Limpiar error cuando el usuario empiece a escribir
     if (error) {
       setError('');
     }
@@ -43,11 +46,9 @@ function Register() {
       const data = await response.json();
       
       if (!response.ok) {
-        // Manejar específicamente el error de email duplicado
         if (data.error_type === 'email_exists') {
           setError(data.message);
         } else if (data.errors && data.errors.email) {
-          // Si hay errores de validación específicos del email
           setError(data.errors.email[0]);
         } else if (data.errors && data.errors.role) {
           setError(data.errors.role[0]);
@@ -58,7 +59,6 @@ function Register() {
         return;
       }
       
-      // Si el registro es exitoso, redirige al login
       navigate('/login');
     } catch (err) {
       setError('Error de conexión con el servidor');

@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import './Contact.css';
 
-function Contact() {
+const MaterialIcon = ({ name, color = '#007AFF', size = 24, className = '' }) => (
+  <span 
+    className={`material-symbols-outlined ${className}`}
+    style={{ color, fontSize: size, verticalAlign: 'middle' }}
+  >
+    {name}
+  </span>
+);
+
+function Contact(props) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,8 +22,17 @@ function Contact() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === 'message' && value.length > 500) {
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -27,7 +45,6 @@ function Contact() {
     setError('');
     setSuccess('');
 
-    // Simular envío de formulario (en una app real, aquí iría la llamada a la API)
     setTimeout(() => {
       setLoading(false);
       setSuccess('¡Mensaje enviado exitosamente! Te responderemos pronto.');
@@ -38,7 +55,6 @@ function Contact() {
         message: ''
       });
       
-      // Limpiar mensaje de éxito después de 5 segundos
       setTimeout(() => {
         setSuccess('');
       }, 5000);
@@ -58,12 +74,14 @@ function Contact() {
           <div className="contact-grid">
             {/* Información de Contacto */}
             <div className="contact-info-section">
-              <h2>Información de Contacto</h2>
+              <h2>Información de contacto</h2>
               <p>Estamos aquí para ayudarte. No dudes en contactarnos por cualquier consulta.</p>
               
               <div className="contact-details">
                 <div className="contact-item">
-                  <div className="contact-icon">📧</div>
+                  <div className="contact-icon">
+                    <MaterialIcon name="email" color="#007AFF" size={32} />
+                  </div>
                   <div className="contact-text">
                     <h4>Email</h4>
                     <p>info@jobbridge.com</p>
@@ -72,7 +90,9 @@ function Contact() {
                 </div>
 
                 <div className="contact-item">
-                  <div className="contact-icon">📱</div>
+                  <div className="contact-icon">
+                    <MaterialIcon name="phone" color="#007AFF" size={32} />
+                  </div>
                   <div className="contact-text">
                     <h4>Teléfono</h4>
                     <p>+34 91 123 45 67</p>
@@ -81,22 +101,25 @@ function Contact() {
                 </div>
 
                 <div className="contact-item">
-                  <div className="contact-icon">📍</div>
+                  <div className="contact-icon">
+                    <MaterialIcon name="location_on" color="#007AFF" size={32} />
+                  </div>
                   <div className="contact-text">
                     <h4>Oficina</h4>
-                    <p>Calle Gran Vía, 28</p>
-                    <p>28013 Madrid, España</p>
+                    <p>03640 Alicante, Monóvar</p>
                   </div>
                 </div>
 
                 <div className="contact-item">
-                  <div className="contact-icon">🌐</div>
+                  <div className="contact-icon">
+                    <MaterialIcon name="language" color="#007AFF" size={32} />
+                  </div>
                   <div className="contact-text">
-                    <h4>Redes Sociales</h4>
+                    <h4>Redes sociales</h4>
                     <div className="social-links">
-                      <a href="#" className="social-link">LinkedIn</a>
-                      <a href="#" className="social-link">Twitter</a>
-                      <a href="#" className="social-link">Facebook</a>
+                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-link">Instagram</a>
+                      <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="social-link">Twitter</a>
+                      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-link">Facebook</a>
                     </div>
                   </div>
                 </div>
@@ -105,11 +128,11 @@ function Contact() {
               <div className="contact-stats">
                 <div className="stat-item">
                   <div className="stat-number">500+</div>
-                  <div className="stat-label">Empresas Registradas</div>
+                  <div className="stat-label">Empresas registradas</div>
                 </div>
                 <div className="stat-item">
                   <div className="stat-number">2000+</div>
-                  <div className="stat-label">Ofertas Publicadas</div>
+                  <div className="stat-label">Ofertas publicadas</div>
                 </div>
                 <div className="stat-item">
                   <div className="stat-number">10000+</div>
@@ -120,26 +143,39 @@ function Contact() {
 
             {/* Formulario de Contacto */}
             <div className="contact-form-section">
-              <h2>Envíanos un Mensaje</h2>
-              <p>Completa el formulario y te responderemos lo antes posible.</p>
+              <div className="form-header">
+                <h2>
+                  ¡Hablemos!
+                </h2>
+                <p>Cuéntanos qué tienes en mente. Estamos aquí para ayudarte y responder todas tus dudas.</p>
+              </div>
 
               {success && (
                 <div className="success-message">
-                  <div className="success-icon">✓</div>
-                  <p>{success}</p>
+                  <div className="success-icon">
+                    <MaterialIcon name="celebration" color="#00C897" size={32} />
+                  </div>
+                  <div>
+                    <p className="success-title">¡Genial! Tu mensaje está en camino</p>
+                    <p className="success-subtitle">{success}</p>
+                  </div>
                 </div>
               )}
 
               {error && (
                 <div className="error-message">
-                  <div className="error-icon">⚠</div>
-                  <p>{error}</p>
+                  <div className="error-icon">
+                    <MaterialIcon name="sentiment_dissatisfied" color="#E74C3C" size={32} />
+                  </div>
+                  <div>
+                    <p className="error-title">Ups, algo salió mal</p>
+                    <p className="error-subtitle">{error}</p>
+                  </div>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="contact-form">
-                <div className="form-group">
-                  <label htmlFor="name">Nombre Completo *</label>
+                <div className="form-group floating-label">
                   <input
                     type="text"
                     id="name"
@@ -148,12 +184,18 @@ function Contact() {
                     onChange={handleChange}
                     required
                     disabled={loading}
-                    placeholder="Tu nombre completo"
+                    placeholder=" "
+                    className="form-input"
                   />
+                  <label htmlFor="name" className="form-label">
+                    <span className="label-icon">
+                      <MaterialIcon name="waving_hand" color="#007AFF" size={20} />
+                    </span> ¿Cómo te llamamos?
+                  </label>
+                  <div className="input-underline"></div>
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="email">Email *</label>
+                <div className="form-group floating-label">
                   <input
                     type="email"
                     id="email"
@@ -162,12 +204,18 @@ function Contact() {
                     onChange={handleChange}
                     required
                     disabled={loading}
-                    placeholder="tu@email.com"
+                    placeholder=" "
+                    className="form-input"
                   />
+                  <label htmlFor="email" className="form-label">
+                    <span className="label-icon">
+                      <MaterialIcon name="mail" color="#007AFF" size={20} />
+                    </span> Tu email (para responderte)
+                  </label>
+                  <div className="input-underline"></div>
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="subject">Asunto *</label>
+                <div className="form-group floating-label">
                   <select
                     id="subject"
                     name="subject"
@@ -175,20 +223,26 @@ function Contact() {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    className="form-input"
                   >
-                    <option value="">Selecciona un asunto</option>
-                    <option value="general">Consulta General</option>
-                    <option value="support">Soporte Técnico</option>
-                    <option value="business">Oportunidad de Negocio</option>
-                    <option value="partnership">Colaboración</option>
-                    <option value="feedback">Sugerencias</option>
-                    <option value="bug">Reportar un Problema</option>
-                    <option value="other">Otro</option>
+                    <option value="" disabled hidden> </option>
+                    <option value="general">Tengo una pregunta general</option>
+                    <option value="support">Necesito ayuda técnica</option>
+                    <option value="business">Quiero hablar de negocios</option>
+                    <option value="partnership">Me interesa colaborar</option>
+                    <option value="feedback">Tengo una sugerencia</option>
+                    <option value="bug">Encontré un problema</option>
+                    <option value="other">Algo más que quieras contarnos</option>
                   </select>
+                  <label htmlFor="subject" className={`form-label ${formData.subject ? 'label-active' : ''}`}>
+                    <span className="label-icon">
+                      <MaterialIcon name="description" color="#007AFF" size={20} />
+                    </span> ¿De qué quieres hablar?
+                  </label>
+                  <div className="input-underline"></div>
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="message">Mensaje *</label>
+                <div className="form-group floating-label textarea-group">
                   <textarea
                     id="message"
                     name="message"
@@ -197,8 +251,18 @@ function Contact() {
                     required
                     disabled={loading}
                     rows="6"
-                    placeholder="Escribe tu mensaje aquí..."
+                    placeholder=" "
+                    className="form-input"
                   />
+                  <label htmlFor="message" className="form-label">
+                    <span className="label-icon">
+                      <MaterialIcon name="edit" color="#007AFF" size={20} />
+                    </span> Cuéntanos todo con detalle...
+                  </label>
+                  <div className="input-underline"></div>
+                  <div className="char-counter">
+                    {formData.message.length} / 500
+                  </div>
                 </div>
 
                 <button 
@@ -206,7 +270,16 @@ function Contact() {
                   className="submit-btn"
                   disabled={loading}
                 >
-                  {loading ? 'Enviando...' : 'Enviar Mensaje'}
+                  {loading ? (
+                    <>
+                      <span className="btn-loader"></span>
+                      <span>Enviando tu mensaje...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Enviar mensaje</span>
+                    </>
+                  )}
                 </button>
               </form>
             </div>
@@ -218,12 +291,12 @@ function Contact() {
             <div className="faq-grid">
               <div className="faq-item">
                 <h4>¿Cómo puedo publicar una oferta de trabajo?</h4>
-                <p>Regístrate como empresa, inicia sesión y usa el botón "Crear Nueva Oferta" en el panel de empresas.</p>
+                <p>Regístrate como empresa, inicia sesión y usa el botón "Crear nueva oferta" en el panel de empresas.</p>
               </div>
               
               <div className="faq-item">
                 <h4>¿Cuántas ofertas puedo publicar gratuitamente?</h4>
-                <p>Puedes publicar hasta 2 ofertas de trabajo de forma gratuita. Para más ofertas, suscríbete a nuestro plan premium.</p>
+                <p>Puedes publicar hasta 2 ofertas de trabajo de forma gratuita. La opción para publicar más ofertas (plan profesional) todavía no está disponible.</p>
               </div>
               
               <div className="faq-item">

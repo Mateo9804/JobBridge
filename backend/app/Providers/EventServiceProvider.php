@@ -14,10 +14,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         //
     ];
-
-    /**
-     * Register any events for your application.
-     */
     public function boot(): void
     {
         //

@@ -119,8 +119,50 @@
   .application-container {
     margin: 1rem;
     padding: 1.5rem;
+    max-width: 100%;
   }
   .application-header h1 {
     font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .application-container {
+    margin: 0.75rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .application-header h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .application-form {
+    gap: 1rem;
+  }
+
+  .application-form input,
+  .application-form textarea {
+    padding: 12px;
+    font-size: 0.95rem;
+    min-height: 44px;
+  }
+
+  .application-form textarea {
+    min-height: 120px;
+  }
+
+  .application-form button[type="submit"],
+  .application-form .btn-secondary {
+    padding: 12px 20px;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .error-message,
+  .success-message {
+    padding: 0.875rem;
+    font-size: 0.9rem;
   }
 } 

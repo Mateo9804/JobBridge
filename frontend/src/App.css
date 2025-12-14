@@ -1,8 +1,8 @@
-/* Reset and Base Styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  user-select: none;
 }
 
 body {
@@ -16,7 +16,6 @@ body {
   background-color: #ffffff;
 }
 
-/* Global Button Styles */
 button {
   font-family: inherit;
   border: none;
@@ -43,7 +42,6 @@ button:disabled {
   transform: none !important;
 }
 
-/* Primary Button */
 .btn-primary {
   background: linear-gradient(135deg, #007AFF 0%, #0056CC 100%);
   color: white;
@@ -64,7 +62,6 @@ button:disabled {
   transform: translateY(0) scale(0.98);
 }
 
-/* Secondary Button */
 .btn-secondary {
   background: rgba(0, 122, 255, 0.1);
   color: #007AFF;
@@ -81,7 +78,6 @@ button:disabled {
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
 }
 
-/* Success Button */
 .btn-success {
   background: linear-gradient(135deg, #34C759 0%, #28A745 100%);
   color: white;
@@ -98,7 +94,6 @@ button:disabled {
   box-shadow: 0 8px 20px rgba(52, 199, 89, 0.4);
 }
 
-/* Danger Button */
 .btn-danger {
   background: linear-gradient(135deg, #FF3B30 0%, #DC3545 100%);
   color: white;
@@ -115,7 +110,6 @@ button:disabled {
   box-shadow: 0 8px 20px rgba(255, 59, 48, 0.4);
 }
 
-/* Input Styles */
 input, textarea, select {
   font-family: inherit;
   font-size: 16px;
@@ -134,13 +128,16 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
+input, textarea, select, option, [contenteditable="true"] {
+  user-select: text;
+}
+
 input:disabled, textarea:disabled, select:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background: #F5F5F7;
 }
 
-/* Link Styles */
 a {
   color: #007AFF;
   text-decoration: none;
@@ -152,7 +149,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.2;
@@ -179,14 +175,12 @@ h4 {
   font-weight: 600;
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Card Styles */
 .card {
   background: white;
   border-radius: 16px;
@@ -200,7 +194,6 @@ h4 {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
-/* Message Styles */
 .message {
   padding: 16px 20px;
   border-radius: 12px;
@@ -234,7 +227,6 @@ h4 {
   border-left: 4px solid #007AFF;
 }
 
-/* Loading States */
 .loading {
   opacity: 0.7;
   pointer-events: none;
@@ -259,7 +251,6 @@ h4 {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   h1 {
     font-size: 36px;
@@ -306,18 +297,15 @@ h4 {
   }
 }
 
-/* Smooth Scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Selection */
 ::selection {
   background: rgba(0, 122, 255, 0.2);
   color: #1d1d1f;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -337,6 +325,13 @@ html {
 
 .App {
   text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
 }
 
 .App-logo {

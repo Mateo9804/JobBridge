@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,10 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,10 +40,8 @@ function Login() {
         return;
       }
       
-      // Si el login es exitoso, guardar datos en el contexto
       login(data.user, data.access_token);
       
-      // Redirigir a la página de empleos
       navigate('/jobs');
     } catch (err) {
       setError('Error de conexión con el servidor');
@@ -53,7 +55,7 @@ function Login() {
     <div className="login-page">
       <Header />
       <div className="login-container">
-        <h2>Iniciar Sesión en JobBridge</h2>
+        <h2>Iniciar sesión en JobBridge</h2>
         <form onSubmit={handleSubmit}>
           <input
             type="email"
@@ -74,7 +76,7 @@ function Login() {
             disabled={loading}
           />
           <button type="submit" disabled={loading}>
-            {loading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
         </form>
         {error && <p className="error-message">{error}</p>}

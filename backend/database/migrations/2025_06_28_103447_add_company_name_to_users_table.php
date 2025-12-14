@@ -11,13 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('company_name')->nullable()->after('role');
-            $table->string('logo')->nullable();
-            $table->text('description')->nullable();
-            $table->string('website')->nullable();
-            $table->string('location')->nullable();
-        });
+        // description ya existe en create_users_table, no la agregamos de nuevo
+        if (!Schema::hasColumn('users', 'company_name')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('company_name')->nullable()->after('role');
+            });
+        }
+        if (!Schema::hasColumn('users', 'logo')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('logo')->nullable();
+            });
+        }
+        if (!Schema::hasColumn('users', 'website')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('website')->nullable();
+            });
+        }
+        if (!Schema::hasColumn('users', 'location')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('location')->nullable();
+            });
+        }
     }
 
     /**

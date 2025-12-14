@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
 import AuthModal from './AuthModal';
 import { useAuth, useNotification } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import './Companies.css';
+import CompanyApplicationsPanel from './CompanyApplicationsPanel';
 
 function Companies() {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -33,56 +34,58 @@ function Companies() {
   const [selectedSkills, setSelectedSkills] = useState([]);
   
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
-  const { addNotification } = useNotification();
+  const { isAuthenticated, user, token } = useAuth();
+  const { addNotification, fetchNotifications } = useNotification();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const tab = params.get('tab');
 
   // Opciones predefinidas para títulos de puestos
   const jobTitles = [
-    'Desarrollador Frontend',
-    'Desarrollador Backend',
-    'Desarrollador Full Stack',
-    'Desarrollador Mobile',
-    'Desarrollador React',
-    'Desarrollador Angular',
-    'Desarrollador Vue.js',
-    'Desarrollador Node.js',
-    'Desarrollador Python',
-    'Desarrollador Java',
+    'Desarrollador frontend',
+    'Desarrollador backend',
+    'Desarrollador full stack',
+    'Desarrollador mobile',
+    'Desarrollador react',
+    'Desarrollador angular',
+    'Desarrollador vue.js',
+    'Desarrollador node.js',
+    'Desarrollador python',
+    'Desarrollador java',
     'Desarrollador PHP',
     'Desarrollador .NET',
-    'Desarrollador Ruby',
-    'Desarrollador Go',
-    'Desarrollador Rust',
-    'Ingeniero de Software',
-    'Arquitecto de Software',
-    'DevOps Engineer',
-    'Data Scientist',
-    'Data Engineer',
-    'Machine Learning Engineer',
-    'QA Engineer',
-    'Test Engineer',
-    'Product Manager',
-    'Scrum Master',
-    'Tech Lead',
-    'Team Lead',
-    'Project Manager',
-    'UX/UI Designer',
-    'Diseñador Web',
-    'Analista de Sistemas',
-    'Administrador de Sistemas',
-    'DBA (Database Administrator)',
-    'Cloud Engineer',
-    'Security Engineer',
-    'Blockchain Developer',
-    'Game Developer',
-    'Embedded Developer',
-    'iOS Developer',
-    'Android Developer',
-    'Flutter Developer',
-    'React Native Developer'
+    'Desarrollador ruby',
+    'Desarrollador go',
+    'Desarrollador rust',
+    'Ingeniero de software',
+    'Arquitecto de software',
+    'DevOps engineer',
+    'Data scientist',
+    'Data engineer',
+    'Machine learning engineer',
+    'QA engineer',
+    'Test engineer',
+    'Product manager',
+    'Scrum master',
+    'Tech lead',
+    'Team lead',
+    'Project manager',
+    'UX/UI designer',
+    'Diseñador web',
+    'Analista de sistemas',
+    'Administrador de sistemas',
+    'DBA (Database administrator)',
+    'Cloud engineer',
+    'Security engineer',
+    'Blockchain developer',
+    'Game developer',
+    'Embedded developer',
+    'iOS developer',
+    'Android developer',
+    'Flutter developer',
+    'React native developer'
   ];
 
-  // Opciones predefinidas para skills/lenguajes
   const availableSkills = [
     'HTML', 'CSS', 'JavaScript', 'TypeScript', 'React', 'Angular', 'Vue.js',
     'Node.js', 'Python', 'Java', 'PHP', 'C#', '.NET', 'Ruby', 'Go', 'Rust',
@@ -105,36 +108,37 @@ function Companies() {
     'CI/CD', 'TDD', 'BDD', 'DDD', 'Clean Architecture'
   ];
 
-  // Cargar trabajos al montar el componente
   useEffect(() => {
     if (isAuthenticated && user?.role === 'company') {
       fetchJobs();
     }
   }, [isAuthenticated, user]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   const fetchJobs = async () => {
+    setLoading(true);
+    setError('');
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
       const response = await fetch(API_ENDPOINTS.COMPANY_JOBS, {
-        signal: controller.signal
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
       });
-      
-      clearTimeout(timeoutId);
-      
       if (response.ok) {
         const data = await response.json();
         setJobs(data);
       } else {
-        console.error('Error fetching jobs:', response.status);
+        setJobs([]);
+        setError('Error al cargar las ofertas de trabajo');
       }
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.error('Request timeout');
-      } else {
-        console.error('Error fetching jobs:', error);
-      }
+    } catch (err) {
+      setJobs([]);
+      setError('Error de conexión al cargar las ofertas');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,7 +146,6 @@ function Companies() {
     e.preventDefault();
     setError('');
     
-    // Validación adicional antes de enviar
     if (form.salaryMin > form.salaryMax) {
       setError('El salario mínimo no puede ser mayor que el máximo');
       return;
@@ -155,7 +158,6 @@ function Companies() {
     
     setLoading(true);
 
-    // Convertir skills a array antes de enviar
     const formToSend = {
       ...form,
       company: user?.company_name || user?.name || '',
@@ -167,16 +169,19 @@ function Companies() {
     try {
       const response = await fetch(API_ENDPOINTS.JOBS, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(formToSend),
       });
 
       if (response.ok) {
         setSuccess('¡Oferta creada exitosamente!');
-        addNotification('¡Has publicado una nueva oferta de empleo!');
         setShowCreateForm(false);
         setSelectedSkills([]);
         fetchJobs();
+        fetchNotifications();
         setTimeout(() => {
           setSuccess('');
           setForm({
@@ -202,7 +207,6 @@ function Companies() {
   const handleEditJob = (job) => {
     setEditingJob(job);
     
-    // Procesar skills para el formulario de edición
     let jobSkills = [];
     if (Array.isArray(job.skills)) {
       jobSkills = job.skills;
@@ -244,13 +248,17 @@ function Companies() {
 
     const formToSend = {
       ...form,
+      company: user?.company_name || user?.name || '',
       skills: selectedSkills,
     };
 
     try {
       const response = await fetch(`${API_ENDPOINTS.JOBS}/${editingJob.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(formToSend),
       });
 
@@ -260,6 +268,7 @@ function Companies() {
         setEditingJob(null);
         setSelectedSkills([]);
         fetchJobs();
+        fetchNotifications();
         setTimeout(() => {
           setSuccess('');
         }, 3000);
@@ -275,25 +284,26 @@ function Companies() {
   };
 
   const handleDeleteJob = async (jobId) => {
-    // Set individual loading state
     setDeletingJobId(jobId);
 
-    // Optimistic update: remove from UI immediately
     const jobToDelete = jobs.find(job => job.id === jobId);
     setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
 
     try {
       const response = await fetch(`${API_ENDPOINTS.JOBS}/${jobId}`, {
         method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
       });
 
       if (response.ok) {
         setSuccess('¡Oferta eliminada exitosamente!');
+        fetchNotifications();
         setTimeout(() => {
           setSuccess('');
         }, 3000);
       } else {
-        // If deletion failed, restore the job to the list
         setJobs(prevJobs => [...prevJobs, jobToDelete].sort((a, b) => a.id - b.id));
         setError('Error al eliminar la oferta. Inténtalo de nuevo.');
         setTimeout(() => {
@@ -301,7 +311,6 @@ function Companies() {
         }, 3000);
       }
     } catch (err) {
-      // If network error, restore the job to the list
       setJobs(prevJobs => [...prevJobs, jobToDelete].sort((a, b) => a.id - b.id));
       setError('Error de conexión. Inténtalo de nuevo.');
       setTimeout(() => {
@@ -329,7 +338,6 @@ function Companies() {
     const { name, value } = e.target;
     
     if (name === 'skills') {
-      // Manejar selección múltiple de skills
       const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
       setSelectedSkills(selectedOptions);
       setForm(prev => ({ ...prev, [name]: selectedOptions.join(', ') }));
@@ -337,7 +345,6 @@ function Companies() {
       setForm({ ...form, [name]: value });
     }
     
-    // Validar que el salario máximo no sea menor que el mínimo
     if (name === 'salaryMin' && parseInt(value) > form.salaryMax) {
       setError('El salario mínimo no puede ser mayor que el máximo');
     } else if (name === 'salaryMax' && parseInt(value) < form.salaryMin) {
@@ -376,18 +383,17 @@ function Companies() {
     });
   };
 
-  // Si no está autenticado, mostrar modal de autenticación
   if (!isAuthenticated()) {
     return (
       <div className="companies-page">
         <Header />
         <div className="companies-container">
           <div className="auth-required">
-            <h2>Acceso Requerido</h2>
+            <h2>Acceso requerido</h2>
             <p>Para acceder a la sección de empresas, necesitas iniciar sesión o registrarte.</p>
             <div className="auth-buttons">
               <button onClick={() => setShowAuthModal(true)} className="btn-primary">
-                Iniciar Sesión o Registrarse
+                Iniciar sesión o registrarse
               </button>
             </div>
           </div>
@@ -397,14 +403,13 @@ function Companies() {
     );
   }
 
-  // Si es usuario (no empresa), mostrar mensaje de acceso denegado
-  if (user?.role === 'user') {
+  if (user?.role !== 'company') {
     return (
       <div className="companies-page">
         <Header />
         <div className="companies-container">
           <div className="access-denied">
-            <h2>Acceso Restringido</h2>
+            <h2>Acceso restringido</h2>
             <p>Esta sección es exclusiva para empresas. Solo las empresas pueden crear y gestionar ofertas de trabajo.</p>
             <div className="access-buttons">
               <button onClick={() => navigate('/jobs')} className="btn-primary">
@@ -417,13 +422,23 @@ function Companies() {
     );
   }
 
-  // Si es empresa, mostrar panel de gestión
+  if (tab === 'applications') {
+    return (
+      <div className="companies-page">
+        <Header />
+        <div className="companies-container">
+          <CompanyApplicationsPanel />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="companies-page">
       <Header />
       <div className="companies-container">
         <div className="companies-header">
-          <h1>Panel de Empresa</h1>
+          <h1>Panel de empresa</h1>
           <p>Gestiona tus ofertas de trabajo</p>
         </div>
 
@@ -436,28 +451,40 @@ function Companies() {
 
         <div className="companies-content">
           <div className="companies-actions">
-            <button 
-              onClick={() => setShowCreateForm(true)}
-              className="btn-create-job"
-              disabled={jobs.length >= 2}
-            >
-              + Crear Nueva Oferta
-            </button>
-            {jobs.length >= 2 && (
-              <p className="limit-notice">
-                Has alcanzado el límite de 2 ofertas gratuitas. 
-                <button 
-                  onClick={() => setShowLimitModal(true)}
-                  className="btn-upgrade"
-                >
-                  Actualizar a Premium
-                </button>
-              </p>
-            )}
+            {(() => {
+              // En este proyecto solo existe el plan gratuito.
+              const limitReached = jobs.length >= 2;
+              
+              return (
+                <>
+                  <button 
+                    onClick={() => setShowCreateForm(true)}
+                    className="btn-create-job"
+                    disabled={limitReached}
+                  >
+                    + Crear nueva oferta
+                  </button>
+                  {limitReached && (
+                    <p className="limit-notice">
+                      Has alcanzado el límite de 2 ofertas (Plan gratuito). 
+                      <button 
+                        onClick={() => setShowLimitModal(true)}
+                        className="btn-upgrade"
+                      >
+                        Plan profesional (próximamente)
+                      </button>
+                    </p>
+                  )}
+                </>
+              );
+            })()}
           </div>
 
           <div className="companies-jobs">
-            <h3>Tus Ofertas de Trabajo ({jobs.length}/2)</h3>
+            {(() => {
+              const limitText = `2`;
+              return <h3>Tus ofertas de trabajo ({jobs.length}/{limitText})</h3>;
+            })()}
             
             {jobs.length === 0 ? (
               <div className="no-jobs">
@@ -509,7 +536,7 @@ function Companies() {
           <div className="modal-overlay" onClick={() => setShowCreateForm(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h2>Crear Nueva Oferta de Trabajo</h2>
+                <h2>Crear nueva oferta de trabajo</h2>
                 <button className="modal-close" onClick={() => setShowCreateForm(false)}>
                   ×
                 </button>
@@ -518,7 +545,7 @@ function Companies() {
               <form onSubmit={handleCreateJob} className="create-job-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="title">Título del Puesto *</label>
+                    <label htmlFor="title">Título del puesto *</label>
                     <select
                       id="title"
                       name="title"
@@ -558,7 +585,7 @@ function Companies() {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="type">Tipo de Trabajo *</label>
+                    <label htmlFor="type">Tipo de trabajo</label>
                     <select
                       id="type"
                       name="type"
@@ -573,7 +600,7 @@ function Companies() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="category">Categoría *</label>
+                    <label htmlFor="category">Categoría</label>
                     <select
                       id="category"
                       name="category"
@@ -593,82 +620,26 @@ function Companies() {
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="experience">Experiencia *</label>
-                    <select
-                      id="experience"
-                      name="experience"
-                      value={form.experience}
-                      onChange={handleChange}
-                      required
-                      disabled={loading}
-                    >
-                      <option value="">Selecciona experiencia</option>
-                      <option value="junior">Junior (0-2 años)</option>
-                      <option value="mid">Mid (2-5 años)</option>
-                      <option value="senior">Senior (5+ años)</option>
-                    </select>
-                  </div>
-                </div>
-
+              <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="salary">Rango de Salario (€) *</label>
-                  <div className="salary-range">
-                    <div className="salary-inputs">
-                      <div className="salary-input">
-                        <label htmlFor="salaryMin">Mínimo</label>
-                        <input
-                          type="number"
-                          id="salaryMin"
-                          name="salaryMin"
-                          value={form.salaryMin}
-                          onChange={handleChange}
-                          min="15000"
-                          max="100000"
-                          step="1000"
-                          required
-                          disabled={loading}
-                        />
-                      </div>
-                      <div className="salary-input">
-                        <label htmlFor="salaryMax">Máximo</label>
-                        <input
-                          type="number"
-                          id="salaryMax"
-                          name="salaryMax"
-                          value={form.salaryMax}
-                          onChange={handleChange}
-                          min="15000"
-                          max="100000"
-                          step="1000"
-                          required
-                          disabled={loading}
-                        />
-                      </div>
-                    </div>
-                    <div className="salary-display">
-                      <span>€{form.salaryMin.toLocaleString()} - €{form.salaryMax.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="description">Descripción del Puesto *</label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    value={form.description}
+                  <label htmlFor="experience">Experiencia</label>
+                  <select
+                    id="experience"
+                    name="experience"
+                    value={form.experience}
                     onChange={handleChange}
-                    rows="4"
-                    placeholder="Describe las responsabilidades y requisitos del puesto..."
                     required
                     disabled={loading}
-                  />
+                  >
+                    <option value="">Selecciona experiencia</option>
+                    <option value="junior">Junior (0-2 años)</option>
+                    <option value="mid">Mid (2-5 años)</option>
+                    <option value="senior">Senior (5+ años)</option>
+                  </select>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="skills">Habilidades Requeridas * (Máximo 5)</label>
+                  <label htmlFor="skills">Habilidades requeridas (Máximo 5)</label>
                   <div className="skills-container">
                     <div className="skills-dropdown">
                       <select
@@ -711,141 +682,10 @@ function Companies() {
                     )}
                   </div>
                 </div>
-
-                {error && <p className="error-message">{error}</p>}
-
-                <div className="form-actions">
-                  <button 
-                    type="button" 
-                    onClick={() => setShowCreateForm(false)}
-                    className="btn-secondary"
-                    disabled={loading}
-                  >
-                    Cancelar
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="btn-primary"
-                    disabled={loading}
-                  >
-                    {loading ? 'Creando...' : 'Crear Oferta'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Modal para editar empleo */}
-        {showEditForm && (
-          <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2>Editar Oferta de Trabajo</h2>
-                <button className="modal-close" onClick={() => setShowEditForm(false)}>
-                  ×
-                </button>
               </div>
-              
-              <form onSubmit={handleUpdateJob} className="create-job-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="title">Título del Puesto *</label>
-                    <select
-                      id="title"
-                      name="title"
-                      value={form.title}
-                      onChange={handleChange}
-                      required
-                      disabled={loading}
-                    >
-                      <option value="">Selecciona un título</option>
-                      {jobTitles.map((title, index) => (
-                        <option key={index} value={title}>{title}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="location">Ubicación *</label>
-                    <select
-                      id="location"
-                      name="location"
-                      value={form.location}
-                      onChange={handleChange}
-                      required
-                      disabled={loading}
-                    >
-                      <option value="">Selecciona una ciudad</option>
-                      <option value="Madrid, España">Madrid</option>
-                      <option value="Barcelona, España">Barcelona</option>
-                      <option value="Valencia, España">Valencia</option>
-                      <option value="Sevilla, España">Sevilla</option>
-                      <option value="Bilbao, España">Bilbao</option>
-                      <option value="Málaga, España">Málaga</option>
-                      <option value="Zaragoza, España">Zaragoza</option>
-                      <option value="Alicante, España">Alicante</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="type">Tipo de Trabajo *</label>
-                    <select
-                      id="type"
-                      name="type"
-                      value={form.type}
-                      onChange={handleChange}
-                      required
-                      disabled={loading}
-                    >
-                      <option value="Presencial">Presencial</option>
-                      <option value="Remoto">Remoto</option>
-                      <option value="Híbrido">Híbrido</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="category">Categoría *</label>
-                    <select
-                      id="category"
-                      name="category"
-                      value={form.category}
-                      onChange={handleChange}
-                      required
-                      disabled={loading}
-                    >
-                      <option value="">Selecciona una categoría</option>
-                      <option value="frontend">Frontend</option>
-                      <option value="backend">Backend</option>
-                      <option value="fullstack">Full Stack</option>
-                      <option value="mobile">Mobile</option>
-                      <option value="devops">DevOps</option>
-                      <option value="data">Data Science</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="experience">Experiencia *</label>
-                    <select
-                      id="experience"
-                      name="experience"
-                      value={form.experience}
-                      onChange={handleChange}
-                      required
-                      disabled={loading}
-                    >
-                      <option value="">Selecciona experiencia</option>
-                      <option value="junior">Junior (0-2 años)</option>
-                      <option value="mid">Mid (2-5 años)</option>
-                      <option value="senior">Senior (5+ años)</option>
-                    </select>
-                  </div>
-                </div>
 
                 <div className="form-group">
-                  <label htmlFor="salary">Rango de Salario (€) *</label>
+                  <label htmlFor="salary">Rango de salario (€)</label>
                   <div className="salary-range">
                     <div className="salary-inputs">
                       <div className="salary-input">
@@ -886,7 +726,194 @@ function Companies() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="description">Descripción del Puesto *</label>
+                  <label htmlFor="description">Descripción del puesto</label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                    rows="4"
+                    placeholder="Describe las responsabilidades y requisitos del puesto..."
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                {error && <p className="error-message">{error}</p>}
+
+                <div className="form-actions">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowCreateForm(false)}
+                    className="btn-secondary"
+                    disabled={loading}
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? 'Creando...' : 'Crear oferta'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal para editar empleo */}
+        {showEditForm && (
+          <div className="modal-overlay" onClick={() => setShowEditForm(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Editar oferta de trabajo</h2>
+                <button className="modal-close" onClick={() => setShowEditForm(false)}>
+                  ×
+                </button>
+              </div>
+              
+              <form onSubmit={handleUpdateJob} className="create-job-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="title">Título del puesto</label>
+                    <select
+                      id="title"
+                      name="title"
+                      value={form.title}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="">Selecciona un título</option>
+                      {jobTitles.map((title, index) => (
+                        <option key={index} value={title}>{title}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="location">Ubicación</label>
+                    <select
+                      id="location"
+                      name="location"
+                      value={form.location}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="">Selecciona una ciudad</option>
+                      <option value="Madrid, España">Madrid</option>
+                      <option value="Barcelona, España">Barcelona</option>
+                      <option value="Valencia, España">Valencia</option>
+                      <option value="Sevilla, España">Sevilla</option>
+                      <option value="Bilbao, España">Bilbao</option>
+                      <option value="Málaga, España">Málaga</option>
+                      <option value="Zaragoza, España">Zaragoza</option>
+                      <option value="Alicante, España">Alicante</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="type">Tipo de trabajo</label>
+                    <select
+                      id="type"
+                      name="type"
+                      value={form.type}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="Presencial">Presencial</option>
+                      <option value="Remoto">Remoto</option>
+                      <option value="Híbrido">Híbrido</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="category">Categoría</label>
+                    <select
+                      id="category"
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="">Selecciona una categoría</option>
+                      <option value="frontend">Frontend</option>
+                      <option value="backend">Backend</option>
+                      <option value="fullstack">Full Stack</option>
+                      <option value="mobile">Mobile</option>
+                      <option value="devops">DevOps</option>
+                      <option value="data">Data Science</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="experience">Experiencia</label>
+                    <select
+                      id="experience"
+                      name="experience"
+                      value={form.experience}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="">Selecciona experiencia</option>
+                      <option value="junior">Junior (0-2 años)</option>
+                      <option value="mid">Mid (2-5 años)</option>
+                      <option value="senior">Senior (5+ años)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="salary">Rango de salario (€)</label>
+                  <div className="salary-range">
+                    <div className="salary-inputs">
+                      <div className="salary-input">
+                        <label htmlFor="salaryMin">Mínimo</label>
+                        <input
+                          type="number"
+                          id="salaryMin"
+                          name="salaryMin"
+                          value={form.salaryMin}
+                          onChange={handleChange}
+                          min="15000"
+                          max="100000"
+                          step="1000"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="salary-input">
+                        <label htmlFor="salaryMax">Máximo</label>
+                        <input
+                          type="number"
+                          id="salaryMax"
+                          name="salaryMax"
+                          value={form.salaryMax}
+                          onChange={handleChange}
+                          min="15000"
+                          max="100000"
+                          step="1000"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
+                    <div className="salary-display">
+                      <span>€{form.salaryMin.toLocaleString()} - €{form.salaryMax.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="description">Descripción del puesto</label>
                   <textarea
                     id="description"
                     name="description"
@@ -900,7 +927,7 @@ function Companies() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="skills">Habilidades Requeridas * (Máximo 5)</label>
+                  <label htmlFor="skills">Habilidades requeridas (Máximo 5)</label>
                   <div className="skills-container">
                     <div className="skills-dropdown">
                       <select
@@ -960,7 +987,7 @@ function Companies() {
                     className="btn-primary"
                     disabled={loading}
                   >
-                    {loading ? 'Actualizando...' : 'Actualizar Oferta'}
+                    {loading ? 'Actualizando...' : 'Actualizar oferta'}
                   </button>
                 </div>
               </form>
@@ -973,43 +1000,26 @@ function Companies() {
           <div className="modal-overlay" onClick={() => setShowLimitModal(false)}>
             <div className="modal-content limit-modal" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h2>¡Límite Alcanzado!</h2>
+                <h2>¡Límite alcanzado!</h2>
                 <button className="modal-close" onClick={() => setShowLimitModal(false)}>
                   ×
                 </button>
               </div>
               
               <div className="limit-content">
-                <div className="limit-icon">💰</div>
-                <h3>Plan Premium Requerido</h3>
+                <div className="limit-icon">ℹ️</div>
+                <h3>Plan profesional (próximamente)</h3>
                 <p>Has alcanzado el límite de <strong>2 ofertas de trabajo gratuitas</strong>.</p>
-                <p>Para publicar más ofertas, suscríbete a nuestro plan premium:</p>
-                
-                <div className="premium-features">
-                  <h4>Plan Premium - $2.99/mes</h4>
-                  <ul>
-                    <li>✅ Ofertas de trabajo ilimitadas</li>
-                    <li>✅ Estadísticas avanzadas</li>
-                    <li>✅ Prioridad en búsquedas</li>
-                    <li>✅ Soporte prioritario</li>
-                  </ul>
-                </div>
-                
+                <p>El plan profesional está en desarrollo y <strong>todavía no está disponible</strong>.</p>
+
                 <div className="premium-actions">
-                  <button className="btn-primary">
-                    Suscribirse por $2.99/mes
+                  <button className="btn-primary" onClick={() => navigate('/pricing')}>
+                    Ver planes
                   </button>
-                  <button 
-                    className="btn-secondary"
-                    onClick={() => setShowLimitModal(false)}
-                  >
-                    Más tarde
+                  <button className="btn-secondary" onClick={() => setShowLimitModal(false)}>
+                    Cerrar
                   </button>
                 </div>
-                
-                <p className="premium-note">
-                  <small>* Esta funcionalidad estará disponible próximamente</small>
-                </p>
               </div>
             </div>
           </div>

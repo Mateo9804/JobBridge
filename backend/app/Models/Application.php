@@ -17,19 +17,13 @@ class Application extends Model
         'phone',
         'email',
         'status',
+        'experience',
     ];
-
-    /**
-     * Get the job that the application is for.
-     */
     public function job()
     {
         return $this->belongsTo(Job::class);
     }
 
-    /**
-     * Get the user that submitted the application.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
