@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Account.css';
 import Header from './Header';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, STORAGE_BASE_URL } from '../config/api';
 
 const DEFAULT_LOGO = '/imagenes/iconoUsuario.png';
 
@@ -53,7 +53,7 @@ function EditCompanyProfile() {
             website: data.website || '',
             location: data.location || '',
           });
-          const storageBase = `${window.location.origin}/jobbrige/backend/public/storage/profile_pictures`;
+          const storageBase = `${STORAGE_BASE_URL}/profile_pictures`;
           setLogoPreview(
             data.profile_picture
               ? `${storageBase}/${data.profile_picture}?t=${Date.now()}`

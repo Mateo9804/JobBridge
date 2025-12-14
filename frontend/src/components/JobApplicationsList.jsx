@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, STORAGE_BASE_URL } from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
 function JobApplicationsList({ jobId }) {
@@ -43,7 +43,7 @@ function JobApplicationsList({ jobId }) {
             <div><strong>Carta de Presentación:</strong> {app.cover_letter}</div>
             <div><strong>Experiencia:</strong> {app.experience}</div>
             {app.resume && (
-              <div><a href={`/storage/${app.resume}`} target="_blank" rel="noopener noreferrer">Ver CV</a></div>
+              <div><a href={`${STORAGE_BASE_URL}/${app.resume}`} target="_blank" rel="noopener noreferrer">Ver CV</a></div>
             )}
             <div><strong>Fecha:</strong> {new Date(app.created_at).toLocaleString()}</div>
           </li>

@@ -11,6 +11,8 @@ backend/.env.*
 
 # Logs / caches
 *.log
+test_log.txt
+backend/test_log.txt
 backend/storage/logs/
 backend/storage/framework/cache/
 backend/storage/framework/sessions/

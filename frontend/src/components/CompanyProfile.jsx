@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './Account.css';
+import { API_ENDPOINTS, STORAGE_BASE_URL } from '../config/api';
 
 const DEFAULT_LOGO = '/imagenes/iconoUsuario.png';
 
@@ -14,7 +15,7 @@ function CompanyProfile() {
     const fetchCompany = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/company/${id}/profile`);
+        const res = await fetch(API_ENDPOINTS.COMPANY_PROFILE(id));
         if (!res.ok) throw new Error('No se pudo cargar el perfil de la empresa');
         const data = await res.json();
         setCompany(data);
@@ -37,7 +38,7 @@ function CompanyProfile() {
         <div className="profile-header">
           <div className="profile-picture-wrapper">
             <img
-              src={company.logo ? `/storage/${company.logo}` : DEFAULT_LOGO}
+              src={company.logo ? `${STORAGE_BASE_URL}/${company.logo}` : DEFAULT_LOGO}
               alt="Logo de la empresa"
               className="profile-picture"
               onError={e => { e.target.onerror = null; e.target.src = DEFAULT_LOGO; }}

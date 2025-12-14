@@ -1,4 +1,18 @@
-const API_BASE_URL = 'http://localhost/jobbrige/backend/public/api';
+// Configurable vía `.env` (Create React App):
+// REACT_APP_API_BASE_URL=http://localhost/jobbrige/backend/public/api
+//
+// Nota: debe terminar en `/api` (ej: http://127.0.0.1:8000/api).
+const DEFAULT_API_BASE_URL = 'http://localhost/jobbrige/backend/public/api';
+
+const normalizeBaseUrl = (url) => String(url || '').replace(/\/+$/, '');
+
+export const API_BASE_URL = normalizeBaseUrl(
+  process.env.REACT_APP_API_BASE_URL || DEFAULT_API_BASE_URL
+);
+
+// Base pública del backend (sin el sufijo /api). Útil para assets en /storage.
+export const API_PUBLIC_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
+export const STORAGE_BASE_URL = `${API_PUBLIC_BASE_URL}/storage`;
 
 export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/register`,
@@ -20,6 +34,7 @@ export const API_ENDPOINTS = {
   NOTIFICATION_MARK_ALL_READ: `${API_BASE_URL}/notifications/read-all`,
   NOTIFICATION_DELETE: id => `${API_BASE_URL}/notifications/${id}`,
   COMPANY_APPLICATIONS: `${API_BASE_URL}/company/applications`,
+  COMPANY_PROFILE: id => `${API_BASE_URL}/company/${id}/profile`,
   COURSES: `${API_BASE_URL}/courses`,
   COURSE_ENROLL: id => `${API_BASE_URL}/courses/${id}/enroll`,
   USER_COURSES: `${API_BASE_URL}/user/courses`,
@@ -27,4 +42,4 @@ export const API_ENDPOINTS = {
   COMPLETE_LESSON: id => `${API_BASE_URL}/enrollments/${id}/complete-lesson`,
 };
 
-export default API_BASE_URL; 
+export default API_BASE_URL;
