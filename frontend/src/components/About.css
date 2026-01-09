@@ -1,0 +1,526 @@
+.about-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.about-hero {
+  background: #f8f9fa;
+  color: #222;
+  text-align: center;
+  padding: 4rem 0 2rem 0;
+}
+
+.about-hero h1 {
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+.about-content {
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.about-section {
+  background: #000;
+  max-width: 1100px;
+  margin: 3rem auto;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  padding: 3rem 2.5rem;
+  border-bottom: none;
+}
+
+.about-section:last-child {
+  margin-bottom: 3rem;
+}
+
+.about-section h2 {
+  color: #fff;
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.about-section p {
+  color: #ccc;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  text-align: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Mission Grid */
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.mission-card {
+  text-align: center;
+  padding: 2rem;
+  background: #111;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+.mission-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 122, 255, 0.10);
+}
+
+.mission-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mission-card h3 {
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.mission-card p {
+  color: #ccc;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Features Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.feature-item {
+  padding: 1.5rem;
+  background: #111;
+  border-radius: 10px;
+  border-left: 4px solid #007AFF;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+.feature-item:hover {
+  background: #222;
+  transform: translateX(5px);
+}
+
+.feature-item h4 {
+  color: #fff;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.feature-item p {
+  color: #ccc;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* Values Grid */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.value-card {
+  padding: 2rem;
+  background: #222;
+  color: #fff;
+  border-radius: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.13);
+}
+
+.value-card h4 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+
+.value-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  color: #ccc;
+}
+
+/* Tech Stack */
+.tech-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.tech-category {
+  text-align: center;
+}
+
+.tech-category h4 {
+  color: #fff;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.tech-tag {
+  background: #111;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.tech-tag:hover {
+  background: #007AFF;
+  color: #fff;
+}
+
+/* Roadmap */
+.roadmap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.roadmap-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  background: #111;
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.roadmap-item:hover {
+  background: #222;
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.13);
+}
+
+.roadmap-item.completed {
+  border-left: 4px solid #48bb78;
+}
+
+.roadmap-item.current {
+  border-left: 4px solid #007AFF;
+}
+
+.roadmap-marker {
+  font-size: 2rem;
+  margin-right: 1rem;
+}
+
+.roadmap-content h4 {
+  color: #fff;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.roadmap-content p {
+  color: #ccc;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Contact Info */
+.contact-info {
+  background: #111;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.contact-info p {
+  color: #ccc;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  justify-content: center;
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+}
+.contact-item:hover {
+  background: #007aff;
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(0,122,255,0.18);
+}
+
+.contact-item:hover .contact-icon .material-symbols-outlined {
+  color: #fff !important;
+}
+.contact-item.bg-blue {
+  background: #007aff;
+  color: #fff;
+}
+.contact-item.bg-black {
+  background: #111;
+  color: #fff;
+}
+.contact-item.bg-blue:hover {
+  background: #339dff;
+  color: #fff;
+}
+
+.contact-item.bg-blue:hover .contact-icon .material-symbols-outlined {
+  color: #fff !important;
+}
+.contact-item.bg-black:hover {
+  background: #222;
+  color: #fff;
+}
+
+.contact-item.bg-black:hover .contact-icon .material-symbols-outlined {
+  color: #fff !important;
+}
+.contact-item .contact-icon {
+  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.contact-item span,
+.contact-item a {
+  color: inherit;
+  font-weight: 500;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: color 0.25s;
+}
+.contact-item a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .about-hero {
+    padding: 2rem 0 1rem 0;
+  }
+  .about-section {
+    padding: 2rem 1rem;
+    max-width: 98vw;
+  }
+}
+@media (max-width: 768px) {
+  .about-hero h1 {
+    font-size: 2.2rem;
+  }
+  .about-section h2 {
+    font-size: 1.3rem;
+  }
+  .mission-card, .feature-item, .value-card, .roadmap-item, .contact-info {
+    padding: 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .about-hero {
+    padding: 1rem 0 0.5rem 0;
+  }
+  .about-section {
+    padding: 1rem 0.5rem;
+    border-radius: 12px;
+  }
+  .mission-card, .feature-item, .value-card, .roadmap-item, .contact-info {
+    padding: 0.5rem;
+    font-size: 0.95rem;
+  }
+  .features-grid, .values-grid, .mission-grid, .tech-stack {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-container {
+    padding: 1rem;
+  }
+
+  .about-hero {
+    padding: 2rem 0 1rem 0;
+  }
+
+  .about-hero h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0 0.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+    padding: 0 1rem;
+  }
+
+  .about-section {
+    padding: 1.5rem 1rem;
+    margin: 1.5rem auto;
+    border-radius: 16px;
+    max-width: 100%;
+  }
+
+  .about-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .about-section p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 0 0.5rem;
+  }
+
+  .mission-grid,
+  .features-grid,
+  .values-grid,
+  .tech-stack {
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .mission-card,
+  .feature-item,
+  .value-card {
+    padding: 1.25rem;
+  }
+
+  .mission-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mission-card h3,
+  .value-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mission-card p,
+  .feature-item p,
+  .value-card p {
+    font-size: 0.9rem;
+  }
+
+  .feature-item h4 {
+    font-size: 1.1rem;
+  }
+
+  .tech-category h4 {
+    font-size: 1.1rem;
+  }
+
+  .tech-tag {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .roadmap {
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .roadmap-item {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .roadmap-marker {
+    font-size: 1.5rem;
+  }
+
+  .roadmap-content h4 {
+    font-size: 1rem;
+  }
+
+  .roadmap-content p {
+    font-size: 0.9rem;
+  }
+
+  .contact-info {
+    padding: 1.5rem 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .contact-details {
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .contact-item {
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+    min-height: 48px;
+  }
+
+  .contact-item .contact-icon {
+    font-size: 1.25rem;
+  }
+} 

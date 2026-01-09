@@ -1,0 +1,230 @@
+.application-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.application-container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.application-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 1.5rem;
+}
+
+.application-header .job-info {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.application-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.application-form input,
+.application-form textarea {
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #f7fafc;
+  transition: border-color 0.3s;
+}
+
+.application-form input:focus,
+.application-form textarea:focus {
+  border-color: #007AFF;
+  outline: none;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.cv-selection-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.cv-selection-options .input-hint {
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 1rem;
+  width: 100%;
+  display: block;
+}
+
+.cv-option {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  padding: 12px 15px;
+  border-radius: 10px;
+  transition: background 0.2s, border-color 0.2s;
+  border: 1px solid transparent;
+}
+
+.cv-option:hover {
+  background: #edf2f7;
+  border-color: #cbd5e1;
+}
+
+.cv-option input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.cv-option-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.cv-file-input-wrapper {
+  margin-top: 5px;
+  padding-left: 28px;
+}
+
+.cv-badge {
+  background: #007AFF;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 5px;
+}
+
+.form-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.application-form button[type="submit"],
+.application-form .btn-secondary {
+  margin: 0;
+  width: 100%;
+}
+
+.application-form .btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+.application-form .btn-primary:disabled {
+  background: #d1d5db !important;
+  color: #6b7280 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none !important;
+}
+
+.application-form .btn-primary:disabled:hover {
+  background: #d1d5db !important;
+  color: #6b7280 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.error-message {
+  color: #dc3545;
+  background: #f8d7da;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #f5c6cb;
+  margin: 1rem 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+.success-message {
+  color: #155724;
+  background: #d4edda;
+  padding: 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #c3e6cb;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .application-container {
+    margin: 1rem;
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  .application-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .application-container {
+    margin: 0.75rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .application-header h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .application-form {
+    gap: 1rem;
+  }
+
+  .application-form input,
+  .application-form textarea {
+    padding: 12px;
+    font-size: 0.95rem;
+    min-height: 44px;
+  }
+
+  .application-form textarea {
+    min-height: 120px;
+  }
+
+  .application-form button[type="submit"],
+  .application-form .btn-secondary {
+    padding: 12px 20px;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .error-message,
+  .success-message {
+    padding: 0.875rem;
+    font-size: 0.9rem;
+  }
+} 

@@ -1,0 +1,32 @@
+# Dependencias / builds (no subir)
+node_modules/
+frontend/node_modules/
+backend/vendor/
+
+# Archivos de entorno / secretos
+.env
+.env.*
+backend/.env
+backend/.env.*
+
+# Logs / caches
+*.log
+test_log.txt
+backend/test_log.txt
+backend/storage/logs/
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+backend/bootstrap/cache/*.php
+
+# SQLite local
+backend/database/database.sqlite
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+

@@ -1,0 +1,553 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
+use App\Models\User;
+use App\Models\CvData;
+
+class AuthController extends Controller
+{
+    public function register(Request $request)
+    {
+        Log::info('Registro iniciado', $request->all());
+        
+        try {
+            $validationRules = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:4',
+                'role' => 'required|in:user,company',
+            ];
+
+            // Si el rol es company, agregar validación para company_name
+            if ($request->role === 'company') {
+                $validationRules['company_name'] = 'required|string|max:255';
+            }
+
+            $request->validate($validationRules);
+
+            Log::info('Validación pasada');
+
+            $userData = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+            ];
+
+            // Agregar company_name si el rol es company
+            if ($request->role === 'company') {
+                $userData['company_name'] = $request->company_name;
+            }
+
+            // Usar transacción para garantizar integridad de datos
+            $user = DB::transaction(function () use ($userData) {
+                $user = User::create($userData);
+
+                // Notificación para empresas al registrarse
+                if ($user->role === 'company') {
+                    \App\Models\Notification::createForUser($user->id, 'welcome', '¡Bienvenido a JobBridge!');
+                }
+
+                Log::info('Usuario creado', ['user_id' => $user->id]);
+
+                return $user;
+            });
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user,
+            ], 201);
+            
+        } catch (ValidationException $e) {
+            Log::warning('Error de validación en registro', ['errors' => $e->errors()]);
+            
+            // Verificar si el error es específicamente por email duplicado
+            if (isset($e->errors()['email']) && in_array('The email has already been taken.', $e->errors()['email'])) {
+                return response()->json([
+                    'message' => 'Ya existe una cuenta con este email. ¿Ya tienes una cuenta?',
+                    'error_type' => 'email_exists'
+                ], 422);
+            }
+            
+            // Para otros errores de validación
+            return response()->json([
+                'message' => 'Datos de registro inválidos',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (QueryException $e) {
+            Log::error('Error de base de datos en registro', ['error' => $e->getMessage()]);
+            
+            // Verificar si es un error de clave duplicada (email)
+            if ($e->getCode() == 23000 && strpos($e->getMessage(), 'users_email_unique') !== false) {
+                return response()->json([
+                    'message' => 'Ya existe una cuenta con este email. ¿Ya tienes una cuenta?',
+                    'error_type' => 'email_exists'
+                ], 422);
+            }
+            
+            return response()->json([
+                'message' => 'Error en la base de datos. Inténtalo de nuevo.'
+            ], 500);
+            
+        } catch (\Exception $e) {
+            Log::error('Error inesperado en registro', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Error al crear usuario. Inténtalo de nuevo.'
+            ], 500);
+        }
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ]);
+    }
+
+    //Obtener el perfil del usuario autenticado
+
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+        return response()->json($user);
+    }
+
+    
+    // Actualizar el perfil del usuario autenticado
+    
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+        Log::info('Datos recibidos en updateProfile', $request->all());
+        Log::info('Archivos recibidos', $request->allFiles());
+
+        $data = $request->only(['name', 'company_name', 'description', 'website', 'location', 'industry', 'is_working']);
+
+        // Actualizar campos comunes
+        if (isset($data['name'])) {
+            $user->name = $data['name'];
+        }
+        if (isset($data['company_name'])) {
+            $user->company_name = $data['company_name'];
+        }
+        if (isset($data['description'])) {
+            $user->description = $data['description'];
+        }
+        if (isset($data['website'])) {
+            $user->website = $data['website'];
+        }
+        if (isset($data['location'])) {
+            $user->location = $data['location'];
+        }
+        if (isset($data['industry'])) {
+            $user->industry = $data['industry'];
+        }
+        if (isset($data['is_working'])) {
+            $user->is_working = filter_var($data['is_working'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        // Subir foto de perfil (usuario) o logo (empresa)
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            Log::info('Archivo profile_picture recibido', ['original_name' => $file->getClientOriginalName()]);
+            $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('profile_pictures', $filename, 'public');
+            Log::info('Foto de perfil guardada', ['path' => $path, 'filename' => $filename]);
+            $user->profile_picture = $path;
+            Log::info('Usuario profile_picture actualizado', ['profile_picture' => $user->profile_picture]);
+        }
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            Log::info('Archivo logo recibido', ['original_name' => $file->getClientOriginalName()]);
+            $filename = 'company_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('company_logos', $filename, 'public');
+            $user->logo = $path;
+        }
+
+        // Subir CV si viene (solo usuario)
+        if ($request->hasFile('cv')) {
+            $file = $request->file('cv');
+            $path = $file->store('cvs', 'public');
+            $user->cv = $path;
+        }
+
+        // Si el usuario es empresa y cambia el nombre, actualizar en todos sus trabajos
+        if ($user->role === 'company' && isset($data['company_name'])) {
+            \App\Models\Job::where('user_id', $user->id)->update(['company' => $data['company_name']]);
+        }
+
+        $user->save();
+        \App\Models\Notification::createForUser($user->id, 'profile_update', 'Tu perfil ha sido actualizado correctamente.');
+        Log::info('Usuario actualizado y guardado', [
+            'user_id' => $user->id,
+            'profile_picture' => $user->profile_picture,
+            'name' => $user->name
+        ]);
+        
+        // Recargar el usuario desde la BD para asegurar que tenemos los datos más recientes
+        $user->refresh();
+        
+        return response()->json($user);
+    }
+
+    // Descargar CV del usuario autenticado
+     
+    public function downloadCv(Request $request)
+    {
+        $user = $request->user();
+        $user->refresh(); 
+        
+        // Obtener CV creado en la página
+        $cvData = CvData::where('user_id', $user->id)->first();
+        
+        // Verificar cuál es el más reciente comparando fechas de actualización
+        $hasUploadedCv = $user->cv && file_exists(storage_path('app/public/' . $user->cv));
+        $hasCreatedCv = $cvData !== null;
+        
+        if ($hasUploadedCv && $hasCreatedCv) {
+            $uploadedCvTime = filemtime(storage_path('app/public/' . $user->cv));
+            
+            // Para CV creado: usar la fecha de actualización del CV creado
+            $createdCvTime = $cvData->updated_at ? $cvData->updated_at->timestamp : 0;
+            
+            Log::info('Comparando fechas de CV', [
+                'uploaded_cv_time' => $uploadedCvTime,
+                'created_cv_time' => $createdCvTime,
+                'uploaded_cv_date' => date('Y-m-d H:i:s', $uploadedCvTime),
+                'created_cv_date' => $cvData->updated_at ? $cvData->updated_at->toDateTimeString() : null,
+            ]);
+            
+            // Si el CV creado es más reciente o igual, usar ese
+            if ($createdCvTime >= $uploadedCvTime) {
+                Log::info('Usando CV creado (más reciente)');
+                return $this->generateCvPdfFromData($user, $cvData);
+            } else {
+                Log::info('Usando CV subido (más reciente)');
+                $filePath = storage_path('app/public/' . $user->cv);
+                $fileName = basename($filePath);
+                $mimeType = mime_content_type($filePath);
+                
+                if (!$mimeType || $mimeType === 'application/octet-stream') {
+                    $mimeType = 'application/pdf';
+                }
+                
+                return response()->download($filePath, $fileName, [
+                    'Content-Type' => $mimeType,
+                    'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                ]);
+            }
+        } elseif ($hasUploadedCv) {
+            $filePath = storage_path('app/public/' . $user->cv);
+            $fileName = basename($filePath);
+            $mimeType = mime_content_type($filePath);
+            
+            if (!$mimeType || $mimeType === 'application/octet-stream') {
+                $mimeType = 'application/pdf';
+            }
+            
+            return response()->download($filePath, $fileName, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            ]);
+        } elseif ($hasCreatedCv) {
+            return $this->generateCvPdfFromData($user, $cvData);
+        }
+        
+        return response()->json(['message' => 'No hay CV disponible'], 404);
+    }
+
+    // Generar PDF del CV creado con foto de perfil
+    
+    private function generateCvPdfFromData($user, $cvData)
+    {
+        try {
+            $hasGd = extension_loaded('gd');
+            
+            if (!$hasGd) {
+                Log::warning('GD extension no disponible, generando PDF sin imagen de perfil');
+            }
+            
+            $options = [
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => false,
+                'isPhpEnabled' => true,
+            ];
+            
+            if (!$hasGd) {
+                $options['enableImage'] = false;
+            }
+            
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::setOptions($options)->loadView('cv.pdf', [
+                'cvData' => $cvData,
+                'user' => $user,
+            ]);
+            
+            $fileName = 'CV_' . str_replace(' ', '_', $cvData->full_name) . '.pdf';
+            
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, $fileName, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                'Access-Control-Expose-Headers' => 'Content-Disposition'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error generando PDF del CV', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            if (strpos($e->getMessage(), 'GD extension') !== false) {
+                try {
+                    Log::info('Reintentando generación de PDF sin imagen debido a falta de GD');
+                    $pdf = \Barryvdh\DomPDF\Facade\Pdf::setOptions([
+                        'isHtml5ParserEnabled' => true,
+                        'isRemoteEnabled' => false,
+                        'isPhpEnabled' => true,
+                        'enableImage' => false,
+                    ])->loadView('cv.pdf', [
+                        'cvData' => $cvData,
+                        'user' => $user,
+                    ]);
+                    
+                    $fileName = 'CV_' . str_replace(' ', '_', $cvData->full_name) . '.pdf';
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->output();
+                    }, $fileName, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                        'Access-Control-Expose-Headers' => 'Content-Disposition'
+                    ]);
+                } catch (\Exception $e2) {
+                    Log::error('Error en segundo intento de generación de PDF', [
+                        'error' => $e2->getMessage()
+                    ]);
+                }
+            }
+            
+            return response()->json(['message' => 'Error al generar el PDF: ' . $e->getMessage()], 500);
+        }
+    }
+    public function getProfilePicture(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            Log::info('Serving profile picture', [
+                'user_id' => $user->id,
+                'profile_picture' => $user->profile_picture
+            ]);
+            
+            if (!$user->profile_picture) {
+                Log::warning('User has no profile picture');
+                abort(404, 'No hay foto de perfil');
+            }
+            
+            $filePath = storage_path('app/public/' . $user->profile_picture);
+            
+            Log::info('Looking for file', ['path' => $filePath, 'exists' => file_exists($filePath)]);
+            
+            if (!file_exists($filePath)) {
+                Log::error('File not found', ['path' => $filePath]);
+                abort(404, 'El archivo no existe: ' . $filePath);
+            }
+            
+            $file = file_get_contents($filePath);
+            $type = mime_content_type($filePath);
+            
+            if (!$type) {
+                $type = 'image/png'; // Por defecto
+            }
+            
+            Log::info('Serving file successfully', ['type' => $type, 'size' => strlen($file)]);
+            
+            return response($file, 200)
+                ->header('Content-Type', $type)
+                ->header('Cache-Control', 'public, max-age=31536000');
+        } catch (\Exception $e) {
+            Log::error('Error serving profile picture', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            abort(500, 'Error al servir la imagen: ' . $e->getMessage());
+        }
+    }
+
+    public function getCompanyProfile($id)
+    {
+        $user = User::where('id', $id)->where('role', 'company')->firstOrFail();
+        // Solo exponer campos públicos
+        return response()->json([
+            'id' => $user->id,
+            'company_name' => $user->company_name,
+            'logo' => $user->logo,
+            'description' => $user->description,
+            'website' => $user->website,
+            'location' => $user->location,
+            'industry' => $user->industry,
+        ]);
+    }
+    public function getCvData(Request $request)
+    {
+        $user = $request->user();
+        $cvData = CvData::where('user_id', $user->id)->first();
+        
+        if (!$cvData) {
+            return response()->json(['message' => 'No hay datos de CV'], 404);
+        }
+        
+        return response()->json($cvData);
+    }
+
+    public function saveCvData(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            $validated = $request->validate([
+                'full_name' => 'nullable|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'phone' => 'nullable|string|max:50',
+                'address' => 'nullable|string|max:500',
+                'birth_date' => 'nullable',
+                'nationality' => 'nullable|string|max:100',
+                'professional_summary' => 'nullable|string',
+                'work_experience' => 'nullable|array',
+                'education' => 'nullable|array',
+                'skills' => 'nullable|array',
+                'languages' => 'nullable|array',
+                'certifications' => 'nullable|array',
+                'references' => 'nullable|array',
+                'additional_info' => 'nullable|array',
+            ]);
+
+            // Normalizar fecha para la BD
+            if (isset($validated['birth_date']) && $validated['birth_date']) {
+                $validated['birth_date'] = date('Y-m-d', strtotime($validated['birth_date']));
+            }
+
+            $cvData = CvData::updateOrCreate(
+                ['user_id' => $user->id],
+                $validated
+            );
+            
+            // Sincronizar con el modelo User para el panel de búsqueda de empresas
+            if (isset($validated['skills'])) {
+                $user->skills = $validated['skills'];
+                $user->technologies = $validated['skills'];
+            }
+            
+            if (isset($validated['languages'])) {
+                $user->languages = $validated['languages'];
+            }
+            
+            if (isset($validated['full_name'])) $user->full_name = $validated['full_name'];
+            if (isset($validated['phone'])) $user->phone = $validated['phone'];
+            if (isset($validated['nationality'])) $user->nationality = $validated['nationality'];
+            if (isset($validated['birth_date']) && $validated['birth_date']) {
+                $user->birthday = $validated['birth_date'];
+            }
+            
+            $user->is_profile_complete = true;
+            $user->save();
+            
+            $cvData->touch();
+            $cvData->refresh();
+
+            return response()->json([
+                'cv_data' => $cvData,
+                'user' => $user
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al guardar CV Data: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
+            return response()->json([
+                'message' => 'Error interno al guardar los datos del CV: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function generateCvPdf(Request $request)
+    {
+        $user = $request->user();
+        $cvData = CvData::where('user_id', $user->id)->first();
+        
+        if (!$cvData) {
+            return response()->json(['message' => 'No hay datos de CV para generar'], 404);
+        }
+        return response()->json([
+            'message' => 'Generación de PDF pendiente de implementación',
+            'cv_data' => $cvData
+        ]);
+    }
+
+    // Actualizar plan del usuario
+    public function updatePlan(Request $request)
+    {
+        $request->validate([
+            'plan' => 'required|in:free,professional',
+        ]);
+
+        $user = $request->user();
+        $newPlan = $request->plan;
+
+        // Si ya tiene el plan profesional, no hacer nada
+        if ($user->plan === 'professional' && $newPlan === 'professional') {
+            return response()->json([
+                'message' => 'Ya tienes el plan profesional activo',
+                'user' => $user
+            ]);
+        }
+
+        $user->plan = $newPlan;
+        $user->save();
+
+        // Crear notificación
+        $planName = $newPlan === 'professional' ? 'Plan Profesional' : 'Plan Gratuito';
+        \App\Models\Notification::createForUser(
+            $user->id,
+            'plan_update',
+            "Tu plan ha sido actualizado a {$planName}."
+        );
+
+        Log::info('Plan actualizado', [
+            'user_id' => $user->id,
+            'old_plan' => $user->getOriginal('plan'),
+            'new_plan' => $newPlan
+        ]);
+
+        return response()->json([
+            'message' => 'Plan actualizado correctamente',
+            'user' => $user
+        ]);
+    }
+}
