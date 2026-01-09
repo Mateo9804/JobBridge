@@ -900,7 +900,7 @@ function Companies() {
                           name="salaryMin"
                           value={form.salaryMin}
                           onChange={handleChange}
-                          min="15000"
+                          min="1"
                           max="100000"
                           step="1000"
                           required
@@ -915,7 +915,7 @@ function Companies() {
                           name="salaryMax"
                           value={form.salaryMax}
                           onChange={handleChange}
-                          min="15000"
+                          min="1"
                           max="100000"
                           step="1000"
                           required
@@ -1100,7 +1100,7 @@ function Companies() {
                           name="salaryMin"
                           value={form.salaryMin}
                           onChange={handleChange}
-                          min="15000"
+                          min="1"
                           max="100000"
                           step="1000"
                           required
@@ -1115,7 +1115,7 @@ function Companies() {
                           name="salaryMax"
                           value={form.salaryMax}
                           onChange={handleChange}
-                          min="15000"
+                          min="1"
                           max="100000"
                           step="1000"
                           required
