@@ -181,12 +181,19 @@ class AuthController extends Controller
             $disk = Storage::disk('public');
             
             try {
+                // Asegurar que el directorio exista
+                $disk->makeDirectory('profile_pictures');
+                
                 // PRIMERO: Guardar la nueva imagen
                 $path = $request->file('profile_picture')->store('profile_pictures', 'public');
                 
                 // Validar que se guardó correctamente
+                if (!$path || $path === false) {
+                    throw new \Exception('El método store() retornó false o null');
+                }
+                
                 if (!$disk->exists($path)) {
-                    throw new \Exception('La imagen no se guardó correctamente');
+                    throw new \Exception('La imagen no se guardó correctamente - archivo no existe después de guardar');
                 }
                 
                 Log::info('Nueva foto de perfil guardada correctamente', ['path' => $path]);
@@ -202,11 +209,16 @@ class AuthController extends Controller
                 
             } catch (\Exception $e) {
                 Log::error('Error al guardar foto de perfil: ' . $e->getMessage(), [
-                    'trace' => $e->getTraceAsString()
+                    'trace' => $e->getTraceAsString(),
+                    'file_info' => [
+                        'original_name' => $request->file('profile_picture')->getClientOriginalName(),
+                        'size' => $request->file('profile_picture')->getSize(),
+                        'mime' => $request->file('profile_picture')->getMimeType(),
+                    ]
                 ]);
                 
                 // Si falló, intentar limpiar la nueva imagen (si se creó pero no se validó)
-                if (isset($path) && $disk->exists($path)) {
+                if (isset($path) && $path && $disk->exists($path)) {
                     try {
                         $disk->delete($path);
                     } catch (\Exception $cleanupException) {
@@ -226,6 +238,9 @@ class AuthController extends Controller
             $disk = Storage::disk('public');
             
             try {
+                // Asegurar que el directorio exista
+                $disk->makeDirectory('company_logos');
+                
                 // PRIMERO: Guardar la nueva imagen
                 $file = $request->file('logo');
                 Log::info('Archivo logo recibido', ['original_name' => $file->getClientOriginalName()]);
@@ -233,8 +248,12 @@ class AuthController extends Controller
                 $path = $file->storeAs('company_logos', $filename, 'public');
                 
                 // Validar que se guardó correctamente
+                if (!$path || $path === false) {
+                    throw new \Exception('El método storeAs() retornó false o null');
+                }
+                
                 if (!$disk->exists($path)) {
-                    throw new \Exception('El logo no se guardó correctamente');
+                    throw new \Exception('El logo no se guardó correctamente - archivo no existe después de guardar');
                 }
                 
                 Log::info('Nuevo logo guardado correctamente', ['path' => $path]);
@@ -250,11 +269,16 @@ class AuthController extends Controller
                 
             } catch (\Exception $e) {
                 Log::error('Error al guardar logo: ' . $e->getMessage(), [
-                    'trace' => $e->getTraceAsString()
+                    'trace' => $e->getTraceAsString(),
+                    'file_info' => [
+                        'original_name' => $request->file('logo')->getClientOriginalName(),
+                        'size' => $request->file('logo')->getSize(),
+                        'mime' => $request->file('logo')->getMimeType(),
+                    ]
                 ]);
                 
                 // Si falló, intentar limpiar la nueva imagen (si se creó pero no se validó)
-                if (isset($path) && $disk->exists($path)) {
+                if (isset($path) && $path && $disk->exists($path)) {
                     try {
                         $disk->delete($path);
                     } catch (\Exception $cleanupException) {
