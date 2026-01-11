@@ -176,16 +176,33 @@ class AuthController extends Controller
         }
 
         // Subir foto de perfil (usuario)
+        Log::info('Verificando profile_picture', [
+            'hasFile' => $request->hasFile('profile_picture'),
+            'allFiles' => array_keys($request->allFiles()),
+            'user_id' => $user->id
+        ]);
+        
         if ($request->hasFile('profile_picture')) {
+            Log::info('Archivo profile_picture detectado, iniciando guardado');
             $oldProfilePicture = $user->profile_picture;
             $disk = Storage::disk('public');
             
             try {
+                $file = $request->file('profile_picture');
+                Log::info('Datos del archivo recibido', [
+                    'original_name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime' => $file->getMimeType(),
+                    'is_valid' => $file->isValid(),
+                    'error' => $file->getError()
+                ]);
+                
                 // Asegurar que el directorio exista
                 $disk->makeDirectory('profile_pictures');
                 
                 // PRIMERO: Guardar la nueva imagen
-                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $path = $file->store('profile_pictures', 'public');
+                Log::info('Resultado de store()', ['path' => $path, 'type' => gettype($path)]);
                 
                 // Validar que se guardó correctamente
                 if (!$path || $path === false) {
@@ -206,19 +223,20 @@ class AuthController extends Controller
                 
                 // TERCERO: Actualizar el campo con la nueva ruta
                 $user->profile_picture = $path;
+                Log::info('Campo profile_picture asignado', ['path' => $path]);
                 
             } catch (\Exception $e) {
                 Log::error('Error al guardar foto de perfil: ' . $e->getMessage(), [
                     'trace' => $e->getTraceAsString(),
-                    'file_info' => [
+                    'file_info' => $request->hasFile('profile_picture') ? [
                         'original_name' => $request->file('profile_picture')->getClientOriginalName(),
                         'size' => $request->file('profile_picture')->getSize(),
                         'mime' => $request->file('profile_picture')->getMimeType(),
-                    ]
+                    ] : null
                 ]);
                 
                 // Si falló, intentar limpiar la nueva imagen (si se creó pero no se validó)
-                if (isset($path) && $path && $disk->exists($path)) {
+                if (isset($path) && $path && isset($disk) && $disk->exists($path)) {
                     try {
                         $disk->delete($path);
                     } catch (\Exception $cleanupException) {
@@ -230,6 +248,8 @@ class AuthController extends Controller
                     'message' => 'Error al guardar la foto de perfil: ' . $e->getMessage()
                 ], 500);
             }
+        } else {
+            Log::info('No se detectó archivo profile_picture en la petición');
         }
         
         // Subir logo (empresa)
