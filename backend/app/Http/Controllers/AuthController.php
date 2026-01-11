@@ -324,7 +324,22 @@ class AuthController extends Controller
             \App\Models\Job::where('user_id', $user->id)->update(['company' => $data['company_name']]);
         }
 
-        $user->save();
+        Log::info('Antes de guardar usuario', [
+            'user_id' => $user->id,
+            'profile_picture' => $user->profile_picture,
+            'dirty' => $user->getDirty(),
+            'changes' => $user->getChanges()
+        ]);
+        
+        $saveResult = $user->save();
+        
+        Log::info('Después de guardar usuario', [
+            'save_result' => $saveResult,
+            'user_id' => $user->id,
+            'profile_picture' => $user->profile_picture,
+            'was_changed' => $user->wasChanged('profile_picture')
+        ]);
+        
         \App\Models\Notification::createForUser($user->id, 'profile_update', 'Tu perfil ha sido actualizado correctamente.');
         Log::info('Usuario actualizado y guardado', [
             'user_id' => $user->id,
@@ -334,6 +349,11 @@ class AuthController extends Controller
         
         // Recargar el usuario desde la BD para asegurar que tenemos los datos más recientes
         $user->refresh();
+        
+        Log::info('Después de refresh usuario', [
+            'user_id' => $user->id,
+            'profile_picture' => $user->profile_picture
+        ]);
         
         $userData = $user->toArray();
         $userData['profile_picture_url'] = $user->profile_picture ? Storage::url($user->profile_picture) : null;
