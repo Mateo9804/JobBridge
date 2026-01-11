@@ -49,6 +49,10 @@ function Account() {
     if (user?.profile_picture_url && !previewPic && !loading && !saving) {
       setPreviewPic(user.profile_picture_url);
     }
+    // Si previewPic está null pero tenemos profile_picture_url, establecerlo
+    if (!previewPic && user?.profile_picture_url && !loading && !saving) {
+      setPreviewPic(user.profile_picture_url);
+    }
   }, [user?.profile_picture_url, loading, previewPic, saving]);
 
   useEffect(() => {

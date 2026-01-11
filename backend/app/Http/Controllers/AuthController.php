@@ -150,6 +150,19 @@ class AuthController extends Controller
         Log::info('Datos recibidos en updateProfile', $request->all());
         Log::info('Archivos recibidos', $request->allFiles());
 
+        // Validar tamaño de archivos antes de procesar
+        if ($request->hasFile('profile_picture')) {
+            $request->validate([
+                'profile_picture' => 'image|max:2048', // 2MB máximo
+            ]);
+        }
+        
+        if ($request->hasFile('logo')) {
+            $request->validate([
+                'logo' => 'image|max:2048', // 2MB máximo
+            ]);
+        }
+
         $data = $request->only(['name', 'company_name', 'description', 'website', 'location', 'industry', 'is_working']);
 
         // Actualizar campos comunes
