@@ -148,25 +148,14 @@ function Account() {
         setDescription(data.description || '');
         setIsWorking(data.is_working || false);
         
-        // Guardar si había una nueva imagen antes de limpiar
-        const hadNewImage = !!profilePic;
-        
         setProfilePic(null);
         
-        // Actualizar el usuario primero para que el estado esté sincronizado
+        // Actualizar el usuario
         if (setUser) setUser(data);
         localStorage.setItem('user', JSON.stringify(data));
         
-        // Si subimos una nueva imagen, mantener la preview local (data: URL) por un momento
-        // para que el usuario vea el cambio inmediatamente, luego actualizar con URL del servidor
-        if (hadNewImage && data.profile_picture_url) {
-          // La preview local (data: URL) ya está establecida, mantenerla
-          // Después de un pequeño delay, actualizar con URL directa del servidor
-          setTimeout(() => {
-            setPreviewPic(data.profile_picture_url);
-          }, 100);
-        } else if (data.profile_picture_url) {
-          // Si no hay nueva imagen pero hay una en el servidor, actualizar normalmente
+        // Actualizar preview con la URL del servidor
+        if (data.profile_picture_url) {
           setPreviewPic(data.profile_picture_url);
         } else {
           setPreviewPic(null);
