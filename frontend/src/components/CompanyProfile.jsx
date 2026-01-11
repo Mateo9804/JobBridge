@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './Account.css';
-import { API_ENDPOINTS, STORAGE_BASE_URL } from '../config/api';
+import { API_ENDPOINTS } from '../config/api';
 
 const DEFAULT_LOGO = '/imagenes/iconoUsuario.png';
 
@@ -38,7 +38,7 @@ function CompanyProfile() {
         <div className="profile-header">
           <div className="profile-picture-wrapper">
             <img
-              src={company.logo ? `${STORAGE_BASE_URL}/${company.logo}` : DEFAULT_LOGO}
+              src={company.logo_url || DEFAULT_LOGO}
               alt="Logo de la empresa"
               className="profile-picture"
               onError={e => { e.target.onerror = null; e.target.src = DEFAULT_LOGO; }}

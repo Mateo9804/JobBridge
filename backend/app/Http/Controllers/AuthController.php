@@ -490,6 +490,7 @@ class AuthController extends Controller
             'id' => $user->id,
             'company_name' => $user->company_name,
             'logo' => $user->logo,
+            'logo_url' => $user->logo ? Storage::url($user->logo) : null,
             'description' => $user->description,
             'website' => $user->website,
             'location' => $user->location,

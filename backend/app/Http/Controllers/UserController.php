@@ -59,6 +59,13 @@ class UserController extends Controller
             ->select('id', 'name', 'full_name', 'first_name', 'last_name', 'email', 'phone', 'nationality', 'birthday', 'education_level', 'skills', 'technologies', 'languages', 'experience_years', 'profile_picture')
             ->get();
 
+        // Agregar URLs de imágenes
+        $users = $users->map(function($user) {
+            $userData = $user->toArray();
+            $userData['profile_picture_url'] = $user->profile_picture ? Storage::url($user->profile_picture) : null;
+            return $userData;
+        });
+
         return response()->json($users);
     }
 

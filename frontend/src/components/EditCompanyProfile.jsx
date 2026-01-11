@@ -61,11 +61,8 @@ function EditCompanyProfile() {
             website: data.website || '',
             location: data.location || '',
           });
-          const storageBase = `${STORAGE_BASE_URL}/profile_pictures`;
           setLogoPreview(
-            data.profile_picture
-              ? `${storageBase}/${data.profile_picture}?t=${Date.now()}`
-              : DEFAULT_LOGO
+            data.profile_picture_url || data.logo_url || DEFAULT_LOGO
           );
         }
       } catch (e) {}
