@@ -175,19 +175,24 @@ class AuthController extends Controller
 
         // Subir foto de perfil (usuario) o logo (empresa)
         if ($request->hasFile('profile_picture')) {
-            // Eliminar la imagen anterior si existe
-            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
-                Storage::disk('public')->delete($user->profile_picture);
-                Log::info('Imagen anterior eliminada', ['path' => $user->profile_picture]);
-            }
-            
             $file = $request->file('profile_picture');
             Log::info('Archivo profile_picture recibido', ['original_name' => $file->getClientOriginalName()]);
+            
+            // Guardar la ruta de la imagen anterior antes de actualizar
+            $oldProfilePicture = $user->profile_picture;
+            
             $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('profile_pictures', $filename, 'public');
             Log::info('Foto de perfil guardada', ['path' => $path, 'filename' => $filename]);
+            
+            // Actualizar con la nueva imagen
             $user->profile_picture = $path;
-            Log::info('Usuario profile_picture actualizado', ['profile_picture' => $user->profile_picture]);
+            
+            // Eliminar la imagen anterior solo después de actualizar el usuario
+            if ($oldProfilePicture && Storage::disk('public')->exists($oldProfilePicture)) {
+                Storage::disk('public')->delete($oldProfilePicture);
+                Log::info('Imagen anterior eliminada', ['path' => $oldProfilePicture]);
+            }
         }
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
