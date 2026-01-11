@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Job;
 use App\Models\Application;
@@ -99,26 +100,35 @@ Route::get('/login', function () {
     return response()->json(['message' => 'No autenticado'], 401);
 })->name('login');
 
-Route::get('/storage/{path}', function ($path) {
-    $path = urldecode($path);
-    $filePath = storage_path('app/public/' . $path);
+Route::get('/storage/{path}', function (string $path) {
+    $path = ltrim($path, '/');
     
-    Log::info('Serving file from storage', [
-        'requested_path' => $path,
-        'full_path' => $filePath,
-        'exists' => file_exists($filePath)
-    ]);
-    
-    if (!file_exists($filePath)) {
-        Log::warning('File not found in storage', ['path' => $filePath]);
-        abort(404, 'File not found: ' . $path);
+    if ($path === '' || str_contains($path, '..')) {
+        abort(404);
     }
     
-    $file = file_get_contents($filePath);
-    $type = mime_content_type($filePath);
+    $disk = Storage::disk('public');
     
-    return response($file, 200)
-        ->header('Content-Type', $type)
-        ->header('Content-Disposition', 'inline; filename="' . basename($filePath) . '"')
-        ->header('Cache-Control', 'public, max-age=31536000');
+    if (!$disk->exists($path)) {
+        abort(404);
+    }
+    
+    // Use a streamed response to avoid "403 Forbidden" issues on some Windows/PHP setups
+    // when serving files outside `public/` with `response()->file(...)`.
+    $mime = $disk->mimeType($path) ?: 'application/octet-stream';
+    $size = $disk->size($path);
+    $stream = $disk->readStream($path);
+    
+    if ($stream === false) {
+        abort(404);
+    }
+    
+    return response()->stream(function () use ($stream) {
+        fpassthru($stream);
+        fclose($stream);
+    }, 200, [
+        'Content-Type' => $mime,
+        'Content-Length' => (string) $size,
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
 })->where('path', '.*');
