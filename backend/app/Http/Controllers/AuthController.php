@@ -175,29 +175,97 @@ class AuthController extends Controller
             $user->is_working = filter_var($data['is_working'], FILTER_VALIDATE_BOOLEAN);
         }
 
-        // Subir foto de perfil (usuario) o logo (empresa)
+        // Subir foto de perfil (usuario)
         if ($request->hasFile('profile_picture')) {
+            $oldProfilePicture = $user->profile_picture;
+            $disk = Storage::disk('public');
+            
             try {
-                // Eliminar la imagen anterior antes de guardar la nueva
-                if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
-                    Storage::disk('public')->delete($user->profile_picture);
-                    Log::info('Imagen anterior eliminada', ['path' => $user->profile_picture]);
+                // PRIMERO: Guardar la nueva imagen
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                
+                // Validar que se guardó correctamente
+                if (!$disk->exists($path)) {
+                    throw new \Exception('La imagen no se guardó correctamente');
                 }
                 
-                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                Log::info('Nueva foto de perfil guardada correctamente', ['path' => $path]);
+                
+                // SEGUNDO: Solo ahora borrar la imagen anterior (si existe)
+                if ($oldProfilePicture && $disk->exists($oldProfilePicture)) {
+                    $disk->delete($oldProfilePicture);
+                    Log::info('Imagen anterior eliminada', ['path' => $oldProfilePicture]);
+                }
+                
+                // TERCERO: Actualizar el campo con la nueva ruta
                 $user->profile_picture = $path;
-                Log::info('Foto de perfil guardada', ['path' => $path]);
+                
             } catch (\Exception $e) {
-                Log::error('Error al guardar foto de perfil: ' . $e->getMessage());
-                return response()->json(['message' => 'Error al guardar la foto de perfil: ' . $e->getMessage()], 500);
+                Log::error('Error al guardar foto de perfil: ' . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                // Si falló, intentar limpiar la nueva imagen (si se creó pero no se validó)
+                if (isset($path) && $disk->exists($path)) {
+                    try {
+                        $disk->delete($path);
+                    } catch (\Exception $cleanupException) {
+                        Log::warning('Error al limpiar imagen fallida', ['error' => $cleanupException->getMessage()]);
+                    }
+                }
+                
+                return response()->json([
+                    'message' => 'Error al guardar la foto de perfil: ' . $e->getMessage()
+                ], 500);
             }
         }
+        
+        // Subir logo (empresa)
         if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-            Log::info('Archivo logo recibido', ['original_name' => $file->getClientOriginalName()]);
-            $filename = 'company_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('company_logos', $filename, 'public');
-            $user->logo = $path;
+            $oldLogo = $user->logo;
+            $disk = Storage::disk('public');
+            
+            try {
+                // PRIMERO: Guardar la nueva imagen
+                $file = $request->file('logo');
+                Log::info('Archivo logo recibido', ['original_name' => $file->getClientOriginalName()]);
+                $filename = 'company_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('company_logos', $filename, 'public');
+                
+                // Validar que se guardó correctamente
+                if (!$disk->exists($path)) {
+                    throw new \Exception('El logo no se guardó correctamente');
+                }
+                
+                Log::info('Nuevo logo guardado correctamente', ['path' => $path]);
+                
+                // SEGUNDO: Solo ahora borrar el logo anterior (si existe)
+                if ($oldLogo && $disk->exists($oldLogo)) {
+                    $disk->delete($oldLogo);
+                    Log::info('Logo anterior eliminado', ['path' => $oldLogo]);
+                }
+                
+                // TERCERO: Actualizar el campo con la nueva ruta
+                $user->logo = $path;
+                
+            } catch (\Exception $e) {
+                Log::error('Error al guardar logo: ' . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                // Si falló, intentar limpiar la nueva imagen (si se creó pero no se validó)
+                if (isset($path) && $disk->exists($path)) {
+                    try {
+                        $disk->delete($path);
+                    } catch (\Exception $cleanupException) {
+                        Log::warning('Error al limpiar logo fallido', ['error' => $cleanupException->getMessage()]);
+                    }
+                }
+                
+                return response()->json([
+                    'message' => 'Error al guardar el logo: ' . $e->getMessage()
+                ], 500);
+            }
         }
 
         // Subir CV si viene (solo usuario)
