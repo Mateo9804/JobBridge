@@ -136,7 +136,9 @@ class AuthController extends Controller
     public function getProfile(Request $request)
     {
         $user = $request->user();
-        return response()->json($user);
+        $userData = $user->toArray();
+        $userData['profile_picture_url'] = $user->profile_picture ? Storage::url($user->profile_picture) : null;
+        return response()->json($userData);
     }
 
     
@@ -175,23 +177,19 @@ class AuthController extends Controller
 
         // Subir foto de perfil (usuario) o logo (empresa)
         if ($request->hasFile('profile_picture')) {
-            $file = $request->file('profile_picture');
-            Log::info('Archivo profile_picture recibido', ['original_name' => $file->getClientOriginalName()]);
-            
-            // Guardar la ruta de la imagen anterior antes de actualizar
-            $oldProfilePicture = $user->profile_picture;
-            
-            $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('profile_pictures', $filename, 'public');
-            Log::info('Foto de perfil guardada', ['path' => $path, 'filename' => $filename]);
-            
-            // Actualizar con la nueva imagen
-            $user->profile_picture = $path;
-            
-            // Eliminar la imagen anterior solo después de actualizar el usuario
-            if ($oldProfilePicture && Storage::disk('public')->exists($oldProfilePicture)) {
-                Storage::disk('public')->delete($oldProfilePicture);
-                Log::info('Imagen anterior eliminada', ['path' => $oldProfilePicture]);
+            try {
+                // Eliminar la imagen anterior antes de guardar la nueva
+                if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                    Storage::disk('public')->delete($user->profile_picture);
+                    Log::info('Imagen anterior eliminada', ['path' => $user->profile_picture]);
+                }
+                
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $user->profile_picture = $path;
+                Log::info('Foto de perfil guardada', ['path' => $path]);
+            } catch (\Exception $e) {
+                Log::error('Error al guardar foto de perfil: ' . $e->getMessage());
+                return response()->json(['message' => 'Error al guardar la foto de perfil: ' . $e->getMessage()], 500);
             }
         }
         if ($request->hasFile('logo')) {
@@ -225,7 +223,10 @@ class AuthController extends Controller
         // Recargar el usuario desde la BD para asegurar que tenemos los datos más recientes
         $user->refresh();
         
-        return response()->json($user);
+        $userData = $user->toArray();
+        $userData['profile_picture_url'] = $user->profile_picture ? Storage::url($user->profile_picture) : null;
+        
+        return response()->json($userData);
     }
 
     // Descargar CV del usuario autenticado

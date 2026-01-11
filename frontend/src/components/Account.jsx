@@ -26,30 +26,30 @@ function Account() {
   const cvInputRef = useRef();
 
 
-  const getProfilePictureUrl = () => {
-    return `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}`;
-  };
-  
   const profilePicUrl = useMemo(() => {
+    // Si hay una preview local (data: URL), usarla
     if (previewPic && previewPic.startsWith('data:')) {
       return previewPic;
     }
+    // Si hay una preview establecida (URL del servidor), usarla
     if (previewPic && !previewPic.startsWith('data:')) {
       return previewPic;
     }
-    if (user?.profile_picture) {
-      return getProfilePictureUrl();
+    // Si el usuario tiene profile_picture_url, usarla directamente
+    if (user?.profile_picture_url) {
+      return user.profile_picture_url;
     }
+    // Fallback a imagen por defecto
     return '/imagenes/iconoUsuario.png';
-  }, [previewPic, user?.profile_picture]);
+  }, [previewPic, user?.profile_picture_url]);
 
   useEffect(() => {
     // Solo establecer previewPic si no hay una ya establecida y no estamos guardando
-    // Esto evita sobrescribir la preview cuando se actualiza el usuario después de guardar
-    if (user?.profile_picture && !previewPic && !loading && !saving) {
-      setPreviewPic(getProfilePictureUrl());
+    // Usar profile_picture_url si está disponible
+    if (user?.profile_picture_url && !previewPic && !loading && !saving) {
+      setPreviewPic(user.profile_picture_url);
     }
-  }, [user?.profile_picture, loading, previewPic, saving]);
+  }, [user?.profile_picture_url, loading, previewPic, saving]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -70,10 +70,9 @@ function Account() {
           setName(data.name || '');
           setDescription(data.description || '');
           setIsWorking(data.is_working || false);
-          // Actualizar preview con endpoint de la API
-          if (data.profile_picture) {
-            const picUrl = `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}`;
-            setPreviewPic(picUrl);
+          // Usar profile_picture_url si está disponible
+          if (data.profile_picture_url) {
+            setPreviewPic(data.profile_picture_url);
           } else {
             setPreviewPic(null);
           }
@@ -160,17 +159,15 @@ function Account() {
         
         // Si subimos una nueva imagen, mantener la preview local (data: URL) por un momento
         // para que el usuario vea el cambio inmediatamente, luego actualizar con URL del servidor
-        if (hadNewImage && data.profile_picture) {
+        if (hadNewImage && data.profile_picture_url) {
           // La preview local (data: URL) ya está establecida, mantenerla
-          // Después de un pequeño delay, actualizar con URL del servidor con timestamp único
+          // Después de un pequeño delay, actualizar con URL directa del servidor
           setTimeout(() => {
-            const picUrl = `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}&v=${Math.random()}`;
-            setPreviewPic(picUrl);
-          }, 500);
-        } else if (data.profile_picture) {
+            setPreviewPic(data.profile_picture_url);
+          }, 100);
+        } else if (data.profile_picture_url) {
           // Si no hay nueva imagen pero hay una en el servidor, actualizar normalmente
-          const picUrl = `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}&v=${Math.random()}`;
-          setPreviewPic(picUrl);
+          setPreviewPic(data.profile_picture_url);
         } else {
           setPreviewPic(null);
         }
