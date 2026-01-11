@@ -44,10 +44,12 @@ function Account() {
   }, [previewPic, user?.profile_picture]);
 
   useEffect(() => {
-    if (user?.profile_picture && !previewPic && !loading) {
+    // Solo establecer previewPic si no hay una ya establecida y no estamos guardando
+    // Esto evita sobrescribir la preview cuando se actualiza el usuario después de guardar
+    if (user?.profile_picture && !previewPic && !loading && !saving) {
       setPreviewPic(getProfilePictureUrl());
     }
-  }, [user?.profile_picture, loading, previewPic]);
+  }, [user?.profile_picture, loading, previewPic, saving]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -147,18 +149,32 @@ function Account() {
         setDescription(data.description || '');
         setIsWorking(data.is_working || false);
         
-        if (setUser) setUser(data);
-        localStorage.setItem('user', JSON.stringify(data));
+        // Guardar si había una nueva imagen antes de limpiar
+        const hadNewImage = !!profilePic;
         
         setProfilePic(null);
         
-        // Forzar una nueva URL con timestamp único para evitar caché
-        if (data.profile_picture) {
+        // Actualizar el usuario primero para que el estado esté sincronizado
+        if (setUser) setUser(data);
+        localStorage.setItem('user', JSON.stringify(data));
+        
+        // Si subimos una nueva imagen, mantener la preview local (data: URL) por un momento
+        // para que el usuario vea el cambio inmediatamente, luego actualizar con URL del servidor
+        if (hadNewImage && data.profile_picture) {
+          // La preview local (data: URL) ya está establecida, mantenerla
+          // Después de un pequeño delay, actualizar con URL del servidor con timestamp único
+          setTimeout(() => {
+            const picUrl = `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}&v=${Math.random()}`;
+            setPreviewPic(picUrl);
+          }, 500);
+        } else if (data.profile_picture) {
+          // Si no hay nueva imagen pero hay una en el servidor, actualizar normalmente
           const picUrl = `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}&v=${Math.random()}`;
           setPreviewPic(picUrl);
         } else {
           setPreviewPic(null);
         }
+        
         setCvFile(data.cv ? { name: data.cv.split('/').pop() } : null);
         
         setToastMessage('Perfil actualizado');
