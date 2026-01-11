@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use App\Models\User;
@@ -174,6 +175,12 @@ class AuthController extends Controller
 
         // Subir foto de perfil (usuario) o logo (empresa)
         if ($request->hasFile('profile_picture')) {
+            // Eliminar la imagen anterior si existe
+            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+                Log::info('Imagen anterior eliminada', ['path' => $user->profile_picture]);
+            }
+            
             $file = $request->file('profile_picture');
             Log::info('Archivo profile_picture recibido', ['original_name' => $file->getClientOriginalName()]);
             $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
@@ -389,7 +396,9 @@ class AuthController extends Controller
             
             return response($file, 200)
                 ->header('Content-Type', $type)
-                ->header('Cache-Control', 'public, max-age=31536000');
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         } catch (\Exception $e) {
             Log::error('Error serving profile picture', [
                 'error' => $e->getMessage(),

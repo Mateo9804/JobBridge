@@ -70,7 +70,7 @@ function Account() {
           setIsWorking(data.is_working || false);
           // Actualizar preview con endpoint de la API
           if (data.profile_picture) {
-            const picUrl = getProfilePictureUrl();
+            const picUrl = `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}`;
             setPreviewPic(picUrl);
           } else {
             setPreviewPic(null);
@@ -152,8 +152,9 @@ function Account() {
         
         setProfilePic(null);
         
+        // Forzar una nueva URL con timestamp único para evitar caché
         if (data.profile_picture) {
-          const picUrl = getProfilePictureUrl();
+          const picUrl = `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}&v=${Math.random()}`;
           setPreviewPic(picUrl);
         } else {
           setPreviewPic(null);
