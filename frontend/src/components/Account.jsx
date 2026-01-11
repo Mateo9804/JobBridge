@@ -26,28 +26,30 @@ function Account() {
   const cvInputRef = useRef();
 
 
-  const getProfilePictureUrl = () => {
-    return `${API_ENDPOINTS.PROFILE_PICTURE}?t=${Date.now()}`;
-  };
-  
   const profilePicUrl = useMemo(() => {
+    // Si hay una preview local (data: URL), usarla
     if (previewPic && previewPic.startsWith('data:')) {
       return previewPic;
     }
+    // Si hay una preview establecida (URL del servidor), usarla
     if (previewPic && !previewPic.startsWith('data:')) {
       return previewPic;
     }
-    if (user?.profile_picture) {
-      return getProfilePictureUrl();
+    // Si el usuario tiene profile_picture_url, usarla directamente
+    if (user?.profile_picture_url) {
+      return user.profile_picture_url;
     }
+    // Fallback a imagen por defecto
     return '/imagenes/iconoUsuario.png';
-  }, [previewPic, user?.profile_picture]);
+  }, [previewPic, user?.profile_picture_url]);
 
   useEffect(() => {
-    if (user?.profile_picture && !previewPic && !loading) {
-      setPreviewPic(getProfilePictureUrl());
+    // Solo establecer previewPic si no hay una ya establecida y no estamos guardando
+    // Usar profile_picture_url si está disponible
+    if (user?.profile_picture_url && !previewPic && !loading && !saving) {
+      setPreviewPic(user.profile_picture_url);
     }
-  }, [user?.profile_picture, loading, previewPic]);
+  }, [user?.profile_picture_url, loading, previewPic, saving]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -68,10 +70,9 @@ function Account() {
           setName(data.name || '');
           setDescription(data.description || '');
           setIsWorking(data.is_working || false);
-          // Actualizar preview con endpoint de la API
-          if (data.profile_picture) {
-            const picUrl = getProfilePictureUrl();
-            setPreviewPic(picUrl);
+          // Usar profile_picture_url si está disponible
+          if (data.profile_picture_url) {
+            setPreviewPic(data.profile_picture_url);
           } else {
             setPreviewPic(null);
           }
@@ -147,17 +148,19 @@ function Account() {
         setDescription(data.description || '');
         setIsWorking(data.is_working || false);
         
+        setProfilePic(null);
+        
+        // Actualizar el usuario
         if (setUser) setUser(data);
         localStorage.setItem('user', JSON.stringify(data));
         
-        setProfilePic(null);
-        
-        if (data.profile_picture) {
-          const picUrl = getProfilePictureUrl();
-          setPreviewPic(picUrl);
+        // Actualizar preview con la URL del servidor
+        if (data.profile_picture_url) {
+          setPreviewPic(data.profile_picture_url);
         } else {
           setPreviewPic(null);
         }
+        
         setCvFile(data.cv ? { name: data.cv.split('/').pop() } : null);
         
         setToastMessage('Perfil actualizado');
