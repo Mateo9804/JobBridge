@@ -3617,37 +3617,81 @@ const LessonContent = () => {
     if (!course) return moduleKeys;
     
     const courseTitle = (course.title || '').toLowerCase();
+    
+    // C++
     if (courseTitle.includes('c++') || courseTitle.includes('cpp')) {
       return moduleKeys.filter(k => k.startsWith('modulo-')).sort((a, b) => {
         const numA = parseInt(a.split('-')[1]);
         const numB = parseInt(b.split('-')[1]);
         return numA - numB;
       });
-    } else if (courseTitle.includes('c#')) {
+    }
+    // C#
+    else if (courseTitle.includes('c#')) {
       return moduleKeys.filter(k => k.startsWith('csharp-')).sort((a, b) => {
         const numA = parseInt(a.split('-')[1]);
         const numB = parseInt(b.split('-')[1]);
         return numA - numB;
       });
-    } else if (courseTitle.includes('programación en c') || courseTitle.includes(' lenguaje c')) {
+    }
+    // C (lenguaje C)
+    else if (courseTitle.includes('programación en c') || courseTitle.includes(' lenguaje c') || (courseTitle.includes('c') && !courseTitle.includes('c++') && !courseTitle.includes('c#'))) {
       return moduleKeys.filter(k => k.startsWith('c-') && !k.startsWith('csharp-')).sort((a, b) => {
         const numA = parseInt(a.split('-')[1]);
         const numB = parseInt(b.split('-')[1]);
         return numA - numB;
       });
-    } else if (courseTitle.includes('spring')) {
+    }
+    // Spring
+    else if (courseTitle.includes('spring')) {
       return moduleKeys.filter(k => k.startsWith('spring-')).sort((a, b) => {
         const numA = parseInt(a.split('-')[1]);
         const numB = parseInt(b.split('-')[1]);
         return numA - numB;
       });
-    } else if (courseTitle.includes('react')) {
+    }
+    // React
+    else if (courseTitle.includes('react')) {
       return moduleKeys.filter(k => k.startsWith('react-')).sort((a, b) => {
         const numA = parseInt(a.split('-')[1]);
         const numB = parseInt(b.split('-')[1]);
         return numA - numB;
       });
     }
+    // HTML y CSS
+    else if (courseTitle.includes('html') && courseTitle.includes('css')) {
+      return moduleKeys.filter(k => k.startsWith('htmlcss-')).sort((a, b) => {
+        const numA = parseInt(a.split('-')[1]);
+        const numB = parseInt(b.split('-')[1]);
+        return numA - numB;
+      });
+    }
+    // Node.js
+    else if (courseTitle.includes('node.js') || courseTitle.includes('nodejs') || courseTitle.includes('express')) {
+      return moduleKeys.filter(k => k.startsWith('nodejs-')).sort((a, b) => {
+        const numA = parseInt(a.split('-')[1]);
+        const numB = parseInt(b.split('-')[1]);
+        return numA - numB;
+      });
+    }
+    // JavaScript
+    else if (courseTitle.includes('javascript') || courseTitle.includes('js')) {
+      return moduleKeys.filter(k => k.startsWith('js-')).sort((a, b) => {
+        const numA = parseInt(a.split('-')[1]);
+        const numB = parseInt(b.split('-')[1]);
+        return numA - numB;
+      });
+    }
+    // Python
+    else if (courseTitle.includes('python')) {
+      return moduleKeys.filter(k => k.startsWith('python-')).sort((a, b) => {
+        const numA = parseInt(a.split('-')[1]);
+        const numB = parseInt(b.split('-')[1]);
+        return numA - numB;
+      });
+    }
+    
+    // Si no coincide con ningún curso específico, devolver todos los módulos
     return moduleKeys;
   };
 
@@ -3919,7 +3963,7 @@ const LessonContent = () => {
                               Siguiente lección
                               <MaterialIcon name="arrow_forward" size={20} />
                             </button>
-                          ) : (isLastLessonInModule && nextModuleId) ? (
+                          ) : (isLastLessonInModule && nextModuleId && currentModuleIndex < moduleIds.length - 1) ? (
                             <button
                               className="btn-secondary"
                               disabled={!isLessonCompleted}
