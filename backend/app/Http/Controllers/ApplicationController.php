@@ -347,17 +347,26 @@ class ApplicationController extends Controller
     private function generateCvPdfFromData($user, $cvData)
     {
         try {
-            // Asegurar que los directorios de caché existan
+            // Asegurar que todos los directorios de caché necesarios existan
+            $directories = [
+                storage_path('fonts'),
+                storage_path('app/temp'),
+                storage_path('framework/views'),
+                storage_path('framework/cache'),
+                storage_path('framework/cache/data'),
+                storage_path('framework/sessions'),
+                storage_path('logs'),
+                bootstrap_path('cache'),
+            ];
+            
+            foreach ($directories as $dir) {
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+            }
+            
             $fontDir = storage_path('fonts');
             $tempDir = storage_path('app/temp');
-            
-            if (!file_exists($fontDir)) {
-                mkdir($fontDir, 0755, true);
-            }
-            
-            if (!file_exists($tempDir)) {
-                mkdir($tempDir, 0755, true);
-            }
             
             $options = [
                 'font_dir' => $fontDir,

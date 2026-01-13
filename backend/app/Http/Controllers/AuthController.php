@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use App\Models\User;
@@ -445,17 +446,37 @@ class AuthController extends Controller
     private function generateCvPdfFromData($user, $cvData)
     {
         try {
-            // Asegurar que los directorios de caché existan
+            // Asegurar que todos los directorios de caché necesarios existan
+            $directories = [
+                storage_path('fonts'),
+                storage_path('app/temp'),
+                storage_path('framework/views'),
+                storage_path('framework/cache'),
+                storage_path('framework/cache/data'),
+                storage_path('framework/sessions'),
+                storage_path('logs'),
+                bootstrap_path('cache'),
+            ];
+            
+            foreach ($directories as $dir) {
+                if (!file_exists($dir)) {
+                    @mkdir($dir, 0755, true);
+                }
+                // Verificar permisos de escritura
+                if (file_exists($dir) && !is_writable($dir)) {
+                    @chmod($dir, 0755);
+                }
+            }
+            
+            // Limpiar caché de vistas para evitar problemas
+            try {
+                \Artisan::call('view:clear');
+            } catch (\Exception $clearException) {
+                Log::warning('No se pudo limpiar el caché de vistas', ['error' => $clearException->getMessage()]);
+            }
+            
             $fontDir = storage_path('fonts');
             $tempDir = storage_path('app/temp');
-            
-            if (!file_exists($fontDir)) {
-                mkdir($fontDir, 0755, true);
-            }
-            
-            if (!file_exists($tempDir)) {
-                mkdir($tempDir, 0755, true);
-            }
             
             $hasGd = extension_loaded('gd');
             
@@ -498,17 +519,26 @@ class AuthController extends Controller
             
             if (strpos($e->getMessage(), 'GD extension') !== false || strpos($e->getMessage(), 'cache path') !== false) {
                 try {
-                    // Asegurar directorios de caché
+                    // Asegurar que todos los directorios de caché necesarios existan
+                    $directories = [
+                        storage_path('fonts'),
+                        storage_path('app/temp'),
+                        storage_path('framework/views'),
+                        storage_path('framework/cache'),
+                        storage_path('framework/cache/data'),
+                        storage_path('framework/sessions'),
+                        storage_path('logs'),
+                        bootstrap_path('cache'),
+                    ];
+                    
+                    foreach ($directories as $dir) {
+                        if (!file_exists($dir)) {
+                            mkdir($dir, 0755, true);
+                        }
+                    }
+                    
                     $fontDir = storage_path('fonts');
                     $tempDir = storage_path('app/temp');
-                    
-                    if (!file_exists($fontDir)) {
-                        mkdir($fontDir, 0755, true);
-                    }
-                    
-                    if (!file_exists($tempDir)) {
-                        mkdir($tempDir, 0755, true);
-                    }
                     
                     Log::info('Reintentando generación de PDF sin imagen debido a falta de GD o problema de caché');
                     $pdf = \Barryvdh\DomPDF\Facade\Pdf::setOptions([
