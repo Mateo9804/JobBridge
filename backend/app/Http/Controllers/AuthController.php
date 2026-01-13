@@ -445,6 +445,18 @@ class AuthController extends Controller
     private function generateCvPdfFromData($user, $cvData)
     {
         try {
+            // Asegurar que los directorios de caché existan
+            $fontDir = storage_path('fonts');
+            $tempDir = storage_path('app/temp');
+            
+            if (!file_exists($fontDir)) {
+                mkdir($fontDir, 0755, true);
+            }
+            
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+            
             $hasGd = extension_loaded('gd');
             
             if (!$hasGd) {
@@ -455,6 +467,9 @@ class AuthController extends Controller
                 'isHtml5ParserEnabled' => true,
                 'isRemoteEnabled' => false,
                 'isPhpEnabled' => true,
+                'font_dir' => $fontDir,
+                'font_cache' => $fontDir,
+                'temp_dir' => $tempDir,
             ];
             
             if (!$hasGd) {
@@ -481,14 +496,29 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             
-            if (strpos($e->getMessage(), 'GD extension') !== false) {
+            if (strpos($e->getMessage(), 'GD extension') !== false || strpos($e->getMessage(), 'cache path') !== false) {
                 try {
-                    Log::info('Reintentando generación de PDF sin imagen debido a falta de GD');
+                    // Asegurar directorios de caché
+                    $fontDir = storage_path('fonts');
+                    $tempDir = storage_path('app/temp');
+                    
+                    if (!file_exists($fontDir)) {
+                        mkdir($fontDir, 0755, true);
+                    }
+                    
+                    if (!file_exists($tempDir)) {
+                        mkdir($tempDir, 0755, true);
+                    }
+                    
+                    Log::info('Reintentando generación de PDF sin imagen debido a falta de GD o problema de caché');
                     $pdf = \Barryvdh\DomPDF\Facade\Pdf::setOptions([
                         'isHtml5ParserEnabled' => true,
                         'isRemoteEnabled' => false,
                         'isPhpEnabled' => true,
                         'enableImage' => false,
+                        'font_dir' => $fontDir,
+                        'font_cache' => $fontDir,
+                        'temp_dir' => $tempDir,
                     ])->loadView('cv.pdf', [
                         'cvData' => $cvData,
                         'user' => $user,

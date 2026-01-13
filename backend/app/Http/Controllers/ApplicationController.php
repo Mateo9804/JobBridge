@@ -347,7 +347,25 @@ class ApplicationController extends Controller
     private function generateCvPdfFromData($user, $cvData)
     {
         try {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('cv.pdf', [
+            // Asegurar que los directorios de caché existan
+            $fontDir = storage_path('fonts');
+            $tempDir = storage_path('app/temp');
+            
+            if (!file_exists($fontDir)) {
+                mkdir($fontDir, 0755, true);
+            }
+            
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+            
+            $options = [
+                'font_dir' => $fontDir,
+                'font_cache' => $fontDir,
+                'temp_dir' => $tempDir,
+            ];
+            
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::setOptions($options)->loadView('cv.pdf', [
                 'cvData' => $cvData,
                 'user' => $user,
             ]);
@@ -357,8 +375,11 @@ class ApplicationController extends Controller
                 'Access-Control-Expose-Headers' => 'Content-Disposition'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error generando PDF del CV en ApplicationController', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error al generar el PDF'], 500);
+            Log::error('Error generando PDF del CV en ApplicationController', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['message' => 'Error al generar el PDF: ' . $e->getMessage()], 500);
         }
     }
 } 
