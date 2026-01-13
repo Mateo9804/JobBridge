@@ -455,7 +455,7 @@ class AuthController extends Controller
                 storage_path('framework/cache/data'),
                 storage_path('framework/sessions'),
                 storage_path('logs'),
-                bootstrap_path('cache'),
+                base_path('bootstrap/cache'),
             ];
             
             foreach ($directories as $dir) {

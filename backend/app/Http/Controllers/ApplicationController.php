@@ -356,7 +356,7 @@ class ApplicationController extends Controller
                 storage_path('framework/cache/data'),
                 storage_path('framework/sessions'),
                 storage_path('logs'),
-                bootstrap_path('cache'),
+                base_path('bootstrap/cache'),
             ];
             
             foreach ($directories as $dir) {
@@ -380,7 +380,11 @@ class ApplicationController extends Controller
             ]);
             
             $fileName = 'CV_' . str_replace(' ', '_', $cvData->full_name) . '.pdf';
-            return $pdf->download($fileName, [
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, $fileName, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
                 'Access-Control-Expose-Headers' => 'Content-Disposition'
             ]);
         } catch (\Exception $e) {
