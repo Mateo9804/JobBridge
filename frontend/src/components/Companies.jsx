@@ -902,7 +902,7 @@ function Companies() {
                           onChange={handleChange}
                           min="1"
                           max="100000"
-                          step="1000"
+                          step="1"
                           required
                           disabled={loading}
                         />
@@ -917,7 +917,7 @@ function Companies() {
                           onChange={handleChange}
                           min="1"
                           max="100000"
-                          step="1000"
+                          step="1"
                           required
                           disabled={loading}
                         />
@@ -1102,7 +1102,7 @@ function Companies() {
                           onChange={handleChange}
                           min="1"
                           max="100000"
-                          step="1000"
+                          step="1"
                           required
                           disabled={loading}
                         />
@@ -1117,7 +1117,7 @@ function Companies() {
                           onChange={handleChange}
                           min="1"
                           max="100000"
-                          step="1000"
+                          step="1"
                           required
                           disabled={loading}
                         />
