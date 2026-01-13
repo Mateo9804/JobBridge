@@ -91,14 +91,14 @@ export default function Checkout() {
 
   const validateExpiryDate = (expiryDate) => {
     if (!expiryDate || expiryDate.length !== 5) {
-      return false;
+      return { valid: false, error: 'Por favor ingresa una fecha de expiración válida (MM/YY)' };
     }
     
     const [month, year] = expiryDate.split('/');
     
     // Validar formato
     if (!month || !year || month.length !== 2 || year.length !== 2) {
-      return false;
+      return { valid: false, error: 'Fecha incorrecta. Por favor ingresa una fecha válida (MM/YY)' };
     }
     
     const expiryMonth = parseInt(month, 10);
@@ -106,12 +106,17 @@ export default function Checkout() {
     
     // Validar que sean números válidos
     if (isNaN(expiryMonth) || isNaN(expiryYear)) {
-      return false;
+      return { valid: false, error: 'Fecha incorrecta. Por favor ingresa números válidos' };
     }
     
     // Validar que el mes esté entre 1 y 12
     if (expiryMonth < 1 || expiryMonth > 12) {
-      return false;
+      return { valid: false, error: 'Fecha incorrecta. El mes debe estar entre 01 y 12' };
+    }
+    
+    // Validar que el año sea razonable (no menor a 2000 ni mayor a 2099)
+    if (expiryYear < 2000 || expiryYear > 2099) {
+      return { valid: false, error: 'Fecha incorrecta. Por favor ingresa un año válido' };
     }
     
     // Obtener la fecha actual
@@ -121,14 +126,14 @@ export default function Checkout() {
     
     // Validar que la fecha no esté en el pasado
     if (expiryYear < currentYear) {
-      return false;
+      return { valid: false, error: 'La fecha de expiración es errónea' };
     }
     
     if (expiryYear === currentYear && expiryMonth < currentMonth) {
-      return false;
+      return { valid: false, error: 'La fecha de expiración es errónea' };
     }
     
-    return true;
+    return { valid: true };
   };
 
   const validateForm = () => {
@@ -144,8 +149,9 @@ export default function Checkout() {
       setError('Por favor ingresa una fecha de expiración válida (MM/YY)');
       return false;
     }
-    if (!validateExpiryDate(formData.expiryDate)) {
-      setError('La fecha de expiración no puede estar en el pasado. Por favor ingresa una fecha válida (MM/YY)');
+    const dateValidation = validateExpiryDate(formData.expiryDate);
+    if (!dateValidation.valid) {
+      setError(dateValidation.error);
       return false;
     }
     if (!formData.cvv || formData.cvv.length !== 3) {
@@ -368,15 +374,15 @@ export default function Checkout() {
               <div className="payment-total">
                 <div className="total-row">
                   <span>Subtotal:</span>
-                  <span>€{planData.price.toFixed(2)}</span>
+                  <span>€{(planData.price / 1.21).toFixed(2)}</span>
                 </div>
                 <div className="total-row">
                   <span>IVA (21%):</span>
-                  <span>€{(planData.price * 0.21).toFixed(2)}</span>
+                  <span>€{(planData.price - (planData.price / 1.21)).toFixed(2)}</span>
                 </div>
                 <div className="total-row total-final">
                   <span>Total:</span>
-                  <span>€{(planData.price * 1.21).toFixed(2)}</span>
+                  <span>€{planData.price.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -385,7 +391,7 @@ export default function Checkout() {
                 className="payment-submit-btn"
                 disabled={loading}
               >
-                {loading ? 'Procesando...' : `Pagar €${(planData.price * 1.21).toFixed(2)}`}
+                {loading ? 'Procesando...' : `Pagar €${planData.price.toFixed(2)}`}
               </button>
 
               <p className="payment-security-note">
