@@ -115,7 +115,7 @@ const JobHelper = () => {
     if (message.match(/cv|curriculum|resumen|carta de presentación|perfil profesional/i)) {
       return {
         role: 'bot',
-        content: 'Tips para mejorar tu CV:\n\n✅ Formato: Mantén un diseño limpio y profesional\n✅ Secciones clave:\n   • Información de contacto\n   • Perfil profesional breve\n   • Experiencia laboral (más reciente primero)\n   • Educación\n   • Habilidades técnicas\n   • Idiomas\n\n✅ Destaca tus logros con números concretos\n✅ Personaliza tu CV según el trabajo\n✅ Actualiza tu CV regularmente\n\n¿Necesitas ayuda con alguna sección específica?',
+        content: 'Tips para mejorar tu CV:\n\n• Formato: Mantén un diseño limpio y profesional\n• Secciones clave:\n   • Información de contacto\n   • Perfil profesional breve\n   • Experiencia laboral (más reciente primero)\n   • Educación\n   • Habilidades técnicas\n   • Idiomas\n\n• Destaca tus logros con números concretos\n• Personaliza tu CV según el trabajo\n• Actualiza tu CV regularmente\n\n¿Necesitas ayuda con alguna sección específica?',
         timestamp: new Date()
       };
     }
@@ -123,7 +123,7 @@ const JobHelper = () => {
     if (message.match(/entrevista|entrevistar|reclutador|preparación|entrevista laboral/i)) {
       return {
         role: 'bot',
-        content: 'Tips para entrevistas:\n\n✅ Preparación:\n   • Investiga la empresa\n   • Revisa tu CV\n   • Prepara preguntas inteligentes\n\n✅ Durante la entrevista:\n   • Llega puntual\n   • Muestra entusiasmo\n   • Da ejemplos concretos de tus logros\n   • Habla con claridad y confianza\n\n✅ Preguntas comunes:\n   • "Cuéntame sobre ti"\n   • "¿Por qué quieres este trabajo?"\n   • "¿Cuáles son tus fortalezas?"\n\n✅ Al final: Pregunta sobre el siguiente paso\n\n¡Mucha suerte!',
+        content: 'Tips para entrevistas:\n\n• Preparación:\n   • Investiga la empresa\n   • Revisa tu CV\n   • Prepara preguntas inteligentes\n\n• Durante la entrevista:\n   • Llega puntual\n   • Muestra entusiasmo\n   • Da ejemplos concretos de tus logros\n   • Habla con claridad y confianza\n\n• Preguntas comunes:\n   • "Cuéntame sobre ti"\n   • "¿Por qué quieres este trabajo?"\n   • "¿Cuáles son tus fortalezas?"\n\n• Al final: Pregunta sobre el siguiente paso\n\n¡Mucha suerte!',
         timestamp: new Date()
       };
     }

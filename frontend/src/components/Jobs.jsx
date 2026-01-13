@@ -285,7 +285,10 @@ function Jobs() {
                 
                 <div className="job-company">
                   <h4>{job.company}</h4>
-                  <span className="job-location">📍 {job.location}</span>
+                  <span className="job-location">
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px', verticalAlign: 'middle', marginRight: '4px' }}>location_on</span>
+                    {job.location}
+                  </span>
                 </div>
                 
                 <p className="job-description">{job.description}</p>

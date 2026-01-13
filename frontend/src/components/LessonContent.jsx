@@ -3849,95 +3849,100 @@ const LessonContent = () => {
                   <button className="btn-secondary" onClick={() => navigate(`/courses/${courseId}`)}>Volver al curso</button>
                 </div>
                 {/* Navigation buttons for previous and next */}
-                {/* Solo mostrar navegación si hay navegación hacia atrás o si el curso no está completo y hay siguiente */}
-                {((previousLesson || previousModuleId) || (progressPct < 100 && (nextLesson || (isLastLessonInModule && nextModuleId && currentModuleIndex < moduleIds.length - 1)))) && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                  {/* Previous navigation */}
-                  <div style={{ display: 'flex', gap: 12 }}>
-                    {previousLesson ? (
-                      <button
-                        className="btn-secondary"
-                        onClick={() => {
-                          navigate(`/courses/${courseId}/module/${moduleId}/lesson/${previousLesson.id}`);
-                        }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-                      >
-                        <MaterialIcon name="arrow_back" size={20} />
-                        Lección anterior
-                      </button>
-                    ) : previousModuleId ? (
-                      <button
-                        className="btn-secondary"
-                        onClick={() => {
-                          const prevModule = moduleContent[previousModuleId];
-                          if (prevModule && prevModule.lessons && prevModule.lessons.length > 0) {
-                            const lastLesson = prevModule.lessons[prevModule.lessons.length - 1];
-                            navigate(`/courses/${courseId}/module/${previousModuleId}/lesson/${lastLesson.id}`);
-                          } else {
-                            navigate(`/courses/${courseId}/module/${previousModuleId}`);
-                          }
-                        }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-                      >
-                        <MaterialIcon name="arrow_back" size={20} />
-                        Módulo anterior
-                      </button>
-                    ) : null}
-                  </div>
-                  {/* Next navigation - Solo mostrar si el curso no está completo */}
-                  {progressPct < 100 && (
-                    <div style={{ display: 'flex', gap: 12 }}>
-                      {nextLesson ? (
-                        <button
-                          className="btn-secondary"
-                          disabled={!isLessonCompleted}
-                          onClick={() => {
-                            navigate(`/courses/${courseId}/module/${moduleId}/lesson/${nextLesson.id}`);
-                          }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-                          title={!isLessonCompleted ? 'Completa la lección actual para continuar' : ''}
-                        >
-                          Siguiente lección
-                          <MaterialIcon name="arrow_forward" size={20} />
-                        </button>
-                      ) : (isLastLessonInModule && nextModuleId && currentModuleIndex < moduleIds.length - 1) ? (
-                        <button
-                          className="btn-secondary"
-                          disabled={!isLessonCompleted}
-                          onClick={() => {
-                            const nextModule = moduleContent[nextModuleId];
-                            if (nextModule && nextModule.lessons && nextModule.lessons.length > 0) {
-                              navigate(`/courses/${courseId}/module/${nextModuleId}/lesson/${nextModule.lessons[0].id}`);
-                            } else {
-                              navigate(`/courses/${courseId}/module/${nextModuleId}`);
-                            }
-                          }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-                          title={!isLessonCompleted ? 'Completa la lección actual para continuar' : ''}
-                        >
-                          Siguiente módulo
-                          <MaterialIcon name="arrow_forward" size={20} />
-                        </button>
-                      ) : null}
+                {/* Verificar si es la última lección del último módulo */}
+                {(() => {
+                  const isLastLessonOfLastModule = isLastLessonInModule && currentModuleIndex === moduleIds.length - 1;
+                  
+                  return (previousLesson || previousModuleId || nextLesson || (isLastLessonInModule && nextModuleId) || isLastLessonOfLastModule) && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                      {/* Previous navigation */}
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        {previousLesson ? (
+                          <button
+                            className="btn-secondary"
+                            onClick={() => {
+                              navigate(`/courses/${courseId}/module/${moduleId}/lesson/${previousLesson.id}`);
+                            }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                          >
+                            <MaterialIcon name="arrow_back" size={20} />
+                            Lección anterior
+                          </button>
+                        ) : previousModuleId ? (
+                          <button
+                            className="btn-secondary"
+                            onClick={() => {
+                              const prevModule = moduleContent[previousModuleId];
+                              if (prevModule && prevModule.lessons && prevModule.lessons.length > 0) {
+                                const lastLesson = prevModule.lessons[prevModule.lessons.length - 1];
+                                navigate(`/courses/${courseId}/module/${previousModuleId}/lesson/${lastLesson.id}`);
+                              } else {
+                                navigate(`/courses/${courseId}/module/${previousModuleId}`);
+                              }
+                            }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                          >
+                            <MaterialIcon name="arrow_back" size={20} />
+                            Módulo anterior
+                          </button>
+                        ) : null}
+                      </div>
+                      {/* Next navigation o mensaje de curso completado */}
+                      {isLastLessonOfLastModule ? (
+                        /* Mensaje cuando es la última lección del último módulo */
+                        <div style={{ 
+                          padding: '12px 16px', 
+                          background: '#e6f7ff', 
+                          borderRadius: '8px', 
+                          color: '#1890ff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8
+                        }}>
+                          <MaterialIcon name="check_circle" size={20} color="#1890ff" />
+                          <MaterialIcon name="celebration" size={20} color="#1890ff" style={{ marginLeft: 4 }} />
+                          <span>¡Curso completado!</span>
+                        </div>
+                      ) : (
+                        /* Botones de navegación hacia adelante */
+                        <div style={{ display: 'flex', gap: 12 }}>
+                          {nextLesson ? (
+                            <button
+                              className="btn-secondary"
+                              disabled={!isLessonCompleted}
+                              onClick={() => {
+                                navigate(`/courses/${courseId}/module/${moduleId}/lesson/${nextLesson.id}`);
+                              }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                              title={!isLessonCompleted ? 'Completa la lección actual para continuar' : ''}
+                            >
+                              Siguiente lección
+                              <MaterialIcon name="arrow_forward" size={20} />
+                            </button>
+                          ) : (isLastLessonInModule && nextModuleId) ? (
+                            <button
+                              className="btn-secondary"
+                              disabled={!isLessonCompleted}
+                              onClick={() => {
+                                const nextModule = moduleContent[nextModuleId];
+                                if (nextModule && nextModule.lessons && nextModule.lessons.length > 0) {
+                                  navigate(`/courses/${courseId}/module/${nextModuleId}/lesson/${nextModule.lessons[0].id}`);
+                                } else {
+                                  navigate(`/courses/${courseId}/module/${nextModuleId}`);
+                                }
+                              }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                              title={!isLessonCompleted ? 'Completa la lección actual para continuar' : ''}
+                            >
+                              Siguiente módulo
+                              <MaterialIcon name="arrow_forward" size={20} />
+                            </button>
+                          ) : null}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {/* Mensaje cuando el curso está completo */}
-                  {progressPct === 100 && (
-                    <div style={{ 
-                      padding: '12px 16px', 
-                      background: '#e6f7ff', 
-                      borderRadius: '8px', 
-                      color: '#1890ff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8
-                    }}>
-                      <MaterialIcon name="check_circle" size={20} color="#1890ff" />
-                      <span>¡Curso completado! 🎉</span>
-                    </div>
-                  )}
-                </div>
-                )}
+                  );
+                })()}
               </div>
             </>
           ) : (
