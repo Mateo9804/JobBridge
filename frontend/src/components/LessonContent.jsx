@@ -3803,7 +3803,7 @@ const LessonContent = () => {
             onClick={() => navigate(`/courses/${courseId}`)}
             style={{ display: 'flex', alignItems: 'center', gap: 8 }}
           >
-            <MaterialIcon name="arrow_back" size={20} />
+            <MaterialIcon name="arrow_back" size={20} color="#ffffff" />
             Volver al curso
           </button>
           <h1>{module.title}</h1>
@@ -3890,16 +3890,30 @@ const LessonContent = () => {
                   >
                     {isLessonCompleted ? 'Completada' : 'Marcar como completada'}
                   </button>
-                  <button className="btn-secondary" onClick={() => navigate(`/courses/${courseId}`)}>Volver al curso</button>
+                  <button 
+                    className="btn-secondary" 
+                    onClick={() => navigate(`/courses/${courseId}`)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <MaterialIcon name="arrow_back" size={20} color="#007AFF" />
+                    Volver al curso
+                  </button>
                 </div>
                 {/* Navigation buttons for previous and next */}
                 {/* Verificar si es la última lección del último módulo */}
                 {(() => {
                   const isLastLessonOfLastModule = isLastLessonInModule && currentModuleIndex === moduleIds.length - 1;
+                  // Verificar si hay siguiente módulo: nextModuleId existe y no es el último módulo
+                  const hasNextModule = nextModuleId !== null && currentModuleIndex >= 0 && currentModuleIndex < moduleIds.length - 1;
                   
-                  return (previousLesson || previousModuleId || nextLesson || (isLastLessonInModule && nextModuleId) || isLastLessonOfLastModule) && (
+                  // Mostrar navegación si hay algo que mostrar (anterior o siguiente)
+                  const hasNavigation = previousLesson || previousModuleId || nextLesson || (isLastLessonInModule && hasNextModule) || isLastLessonOfLastModule;
+                  
+                  if (!hasNavigation) return null;
+                  
+                  return (
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                      {/* Previous navigation */}
+                      {/* Previous navigation - Siempre mostrar si existe */}
                       <div style={{ display: 'flex', gap: 12 }}>
                         {previousLesson ? (
                           <button
@@ -3961,24 +3975,6 @@ const LessonContent = () => {
                               title={!isLessonCompleted ? 'Completa la lección actual para continuar' : ''}
                             >
                               Siguiente lección
-                              <MaterialIcon name="arrow_forward" size={20} />
-                            </button>
-                          ) : (isLastLessonInModule && nextModuleId && currentModuleIndex < moduleIds.length - 1) ? (
-                            <button
-                              className="btn-secondary"
-                              disabled={!isLessonCompleted}
-                              onClick={() => {
-                                const nextModule = moduleContent[nextModuleId];
-                                if (nextModule && nextModule.lessons && nextModule.lessons.length > 0) {
-                                  navigate(`/courses/${courseId}/module/${nextModuleId}/lesson/${nextModule.lessons[0].id}`);
-                                } else {
-                                  navigate(`/courses/${courseId}/module/${nextModuleId}`);
-                                }
-                              }}
-                              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-                              title={!isLessonCompleted ? 'Completa la lección actual para continuar' : ''}
-                            >
-                              Siguiente módulo
                               <MaterialIcon name="arrow_forward" size={20} />
                             </button>
                           ) : null}
