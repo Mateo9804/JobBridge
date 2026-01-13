@@ -109,26 +109,6 @@ Proyecto en desarrollo activo. Versión inicial funcional con las característic
 - **Backend:** Laravel 11, MySQL, Sanctum (autenticación)
 - **Herramientas:** Composer, npm, Git
 
-## Estructura del proyecto
-
-```
-jobbrige/
-├── frontend/          # Aplicación React
-│   ├── src/
-│   │   ├── components/    # Componentes React
-│   │   ├── config/        # Configuración (API endpoints)
-│   │   └── context/       # Context API (autenticación)
-│   └── public/
-├── backend/           # API Laravel
-│   ├── app/
-│   │   ├── Http/Controllers/
-│   │   ├── Models/
-│   │   └── Services/
-│   ├── database/migrations/
-│   └── routes/api.php
-└── README.md
-```
-
 ## Autor
 
 Mateo9804 - [GitHub](https://github.com/Mateo9804)

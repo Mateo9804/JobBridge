@@ -250,9 +250,10 @@ function CVBuilder({ onClose, onSave }) {
   };
 
   const today = new Date().toISOString().split('T')[0];
-  const lastYear = new Date();
-  lastYear.setFullYear(lastYear.getFullYear() - 1);
-  const maxStartDate = lastYear.toISOString().split('T')[0];
+  // Para experiencia laboral, permitir cualquier fecha pasada hasta hoy
+  const maxWorkStartDate = today;
+  // Para educación y certificaciones, también permitir fechas pasadas
+  const maxEducationStartDate = today;
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -469,7 +470,7 @@ function CVBuilder({ onClose, onSave }) {
                     <input
                       type="date"
                       value={exp.startDate}
-                      max={maxStartDate}
+                      max={maxWorkStartDate}
                       onChange={(e) => updateWorkExperience(index, 'startDate', e.target.value)}
                     />
                   </div>
@@ -549,7 +550,7 @@ function CVBuilder({ onClose, onSave }) {
                     <input
                       type="date"
                       value={edu.startDate}
-                      max={maxStartDate}
+                      max={maxEducationStartDate}
                       onChange={(e) => updateEducation(index, 'startDate', e.target.value)}
                     />
                   </div>
@@ -709,7 +710,7 @@ function CVBuilder({ onClose, onSave }) {
                     <input
                       type="date"
                       value={cert.date}
-                      max={maxStartDate}
+                      max={today}
                       onChange={(e) => updateCertification(index, 'date', e.target.value)}
                     />
                   </div>
