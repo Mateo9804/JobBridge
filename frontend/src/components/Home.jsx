@@ -102,7 +102,7 @@ function Home(props) {
       },
       {
         title: "Planes y beneficios",
-        subtitle: "Por ahora el proyecto funciona con un único plan gratuito. El plan profesional se mostrará como \"próximamente\".",
+        subtitle: "Elige el plan que mejor se adapte a tus necesidades. Plan gratuito con funcionalidades básicas o Plan profesional con acceso completo.",
         buttons: [
           { text: "Ver planes", link: "/pricing", primary: true },
           { text: "Mi cuenta", link: "/account", primary: false }

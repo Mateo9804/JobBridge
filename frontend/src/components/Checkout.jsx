@@ -12,10 +12,10 @@ const PLAN_LOOKUP = {
     price: 9.99,
     features: [
       'Postulaciones ilimitadas',
-      'Acceso a funcionalidades avanzadas',
-      'Filtros avanzados de búsqueda',
-      'Reportes de aplicación',
-      'Perfil destacado'
+      'Acceso a todos los cursos premium',
+      'Certificaciones de cursos avanzados',
+      'Prioridad en notificaciones',
+      'Perfil completo con todas las funcionalidades'
     ]
   },
   'company-pro': {
@@ -23,9 +23,9 @@ const PLAN_LOOKUP = {
     price: 14.99,
     features: [
       'Ofertas ilimitadas',
-      'Ofertas destacadas',
+      'Panel de usuarios oficiales',
       'Filtros avanzados de candidatos',
-      'Reportes detallados',
+      'Búsqueda de talentos verificados',
       'Soporte prioritario'
     ]
   },

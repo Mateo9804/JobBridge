@@ -19,14 +19,15 @@ function Pricing() {
       period: 'Siempre',
       features: [
         'Hasta 2 ofertas de trabajo',
-        'Acceso básico a candidatos',
-        'Soporte por email',
-        'Panel de administración básico'
+        'Acceso a candidatos que se postulan',
+        'Panel de administración de ofertas',
+        'Gestión de solicitudes recibidas',
+        'Soporte por email'
       ],
       limitations: [
-        'Sin ofertas destacadas (próximamente)',
-        'Sin filtros avanzados (próximamente)',
-        'Sin reportes detallados (próximamente)'
+        'Sin ofertas ilimitadas',
+        'Sin panel de usuarios oficiales',
+        'Sin filtros avanzados de búsqueda de talentos'
       ],
       popular: false
     },
@@ -37,9 +38,9 @@ function Pricing() {
       period: '/mes',
       features: [
         'Ofertas ilimitadas',
-        'Ofertas destacadas',
+        'Panel de usuarios oficiales',
         'Filtros avanzados de candidatos',
-        'Reportes detallados',
+        'Búsqueda de talentos verificados',
         'Soporte prioritario'
       ],
       limitations: [],
@@ -55,14 +56,15 @@ function Pricing() {
       period: 'Siempre',
       features: [
         'Postularse a 2 ofertas por mes',
-        'Perfil básico',
-        'Búsqueda de empleos',
-        'Notificaciones básicas'
+        'Perfil profesional completo',
+        'Búsqueda y filtrado de empleos',
+        'Acceso a cursos gratuitos',
+        'Notificaciones de aplicaciones',
+        'Guardar ofertas favoritas'
       ],
       limitations: [
-        'Sin acceso a ofertas avanzadas (próximamente)',
-        'Sin filtros avanzados (próximamente)',
-        'Sin reportes de aplicación (próximamente)'
+        'Sin postulaciones ilimitadas',
+        'Sin acceso a cursos premium'
       ],
       popular: false
     },
@@ -73,10 +75,10 @@ function Pricing() {
       period: '/mes',
       features: [
         'Postulaciones ilimitadas',
-        'Acceso a funcionalidades avanzadas',
-        'Filtros avanzados de búsqueda',
-        'Reportes de aplicación',
-        'Perfil destacado'
+        'Acceso a todos los cursos premium',
+        'Certificaciones de cursos avanzados',
+        'Prioridad en notificaciones',
+        'Perfil completo con todas las funcionalidades'
       ],
       limitations: [],
       popular: true
