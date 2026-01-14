@@ -130,6 +130,25 @@ class Enrollment extends Model
             ];
         }
 
+        // Spring Boot Avanzado
+        if (strpos($titleLower, 'spring boot') !== false) {
+            $plannedLessonIds = [
+                'spring-1-1','spring-1-2',
+                'spring-2-1','spring-2-2',
+                'spring-3-1','spring-3-2',
+                'spring-4-1',
+            ];
+        }
+
+        // React Avanzado: Desarrollo Profesional
+        if (strpos($titleLower, 'react avanzado') !== false) {
+            $plannedLessonIds = [
+                'react-1-1','react-1-2',
+                'react-2-1','react-2-2',
+                'react-3-1','react-4-1',
+            ];
+        }
+
         $totalLessons = count($plannedLessonIds);
         if ($totalLessons === 0) {
             return 0;
